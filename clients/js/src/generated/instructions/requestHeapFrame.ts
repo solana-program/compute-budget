@@ -29,14 +29,14 @@ import {
 
 export type RequestHeapFrameInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestHeapFrameInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -94,16 +94,14 @@ export type RequestHeapFrameInputWithSigners = {
 };
 
 export function getRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: RequestHeapFrameInputWithSigners
 ): RequestHeapFrameInstructionWithSigners<TProgram>;
 export function getRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(input: RequestHeapFrameInput): RequestHeapFrameInstruction<TProgram>;
-export function getRequestHeapFrameInstruction(
-  input: RequestHeapFrameInput
-): IInstruction {
+export function getRequestHeapFrameInstruction(input: RequestHeapFrameInput): IInstruction {
   // Program address.
   const programAddress =
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -121,7 +119,7 @@ export function getRequestHeapFrameInstruction(
 
 export function getRequestHeapFrameInstructionRaw<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   args: RequestHeapFrameInstructionDataArgs,
   programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
@@ -135,7 +133,7 @@ export function getRequestHeapFrameInstructionRaw<
 }
 
 export type ParsedRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > = {
   programAddress: Address<TProgram>;
   data: RequestHeapFrameInstructionData;

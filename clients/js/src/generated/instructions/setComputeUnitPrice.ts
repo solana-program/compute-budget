@@ -29,14 +29,14 @@ import {
 
 export type SetComputeUnitPriceInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
 export type SetComputeUnitPriceInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -88,16 +88,14 @@ export type SetComputeUnitPriceInputWithSigners = {
 };
 
 export function getSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: SetComputeUnitPriceInputWithSigners
 ): SetComputeUnitPriceInstructionWithSigners<TProgram>;
 export function getSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(input: SetComputeUnitPriceInput): SetComputeUnitPriceInstruction<TProgram>;
-export function getSetComputeUnitPriceInstruction(
-  input: SetComputeUnitPriceInput
-): IInstruction {
+export function getSetComputeUnitPriceInstruction(input: SetComputeUnitPriceInput): IInstruction {
   // Program address.
   const programAddress =
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -115,7 +113,7 @@ export function getSetComputeUnitPriceInstruction(
 
 export function getSetComputeUnitPriceInstructionRaw<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   args: SetComputeUnitPriceInstructionDataArgs,
   programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
@@ -129,7 +127,7 @@ export function getSetComputeUnitPriceInstructionRaw<
 }
 
 export type ParsedSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > = {
   programAddress: Address<TProgram>;
   data: SetComputeUnitPriceInstructionData;

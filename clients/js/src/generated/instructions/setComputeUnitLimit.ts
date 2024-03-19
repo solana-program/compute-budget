@@ -29,14 +29,14 @@ import {
 
 export type SetComputeUnitLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
 export type SetComputeUnitLimitInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -88,16 +88,14 @@ export type SetComputeUnitLimitInputWithSigners = {
 };
 
 export function getSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: SetComputeUnitLimitInputWithSigners
 ): SetComputeUnitLimitInstructionWithSigners<TProgram>;
 export function getSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(input: SetComputeUnitLimitInput): SetComputeUnitLimitInstruction<TProgram>;
-export function getSetComputeUnitLimitInstruction(
-  input: SetComputeUnitLimitInput
-): IInstruction {
+export function getSetComputeUnitLimitInstruction(input: SetComputeUnitLimitInput): IInstruction {
   // Program address.
   const programAddress =
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -115,7 +113,7 @@ export function getSetComputeUnitLimitInstruction(
 
 export function getSetComputeUnitLimitInstructionRaw<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   args: SetComputeUnitLimitInstructionDataArgs,
   programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
@@ -129,7 +127,7 @@ export function getSetComputeUnitLimitInstructionRaw<
 }
 
 export type ParsedSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > = {
   programAddress: Address<TProgram>;
   data: SetComputeUnitLimitInstructionData;

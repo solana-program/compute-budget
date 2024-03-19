@@ -29,14 +29,14 @@ import {
 
 export type SetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
 export type SetLoadedAccountsDataSizeLimitInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -86,18 +86,16 @@ export type SetLoadedAccountsDataSizeLimitInputWithSigners = {
 };
 
 export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: SetLoadedAccountsDataSizeLimitInputWithSigners
 ): SetLoadedAccountsDataSizeLimitInstructionWithSigners<TProgram>;
 export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: SetLoadedAccountsDataSizeLimitInput
 ): SetLoadedAccountsDataSizeLimitInstruction<TProgram>;
-export function getSetLoadedAccountsDataSizeLimitInstruction(
-  input: SetLoadedAccountsDataSizeLimitInput
-): IInstruction {
+export function getSetLoadedAccountsDataSizeLimitInstruction(input: SetLoadedAccountsDataSizeLimitInput): IInstruction {
   // Program address.
   const programAddress =
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -115,7 +113,7 @@ export function getSetLoadedAccountsDataSizeLimitInstruction(
 
 export function getSetLoadedAccountsDataSizeLimitInstructionRaw<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   args: SetLoadedAccountsDataSizeLimitInstructionDataArgs,
   programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
@@ -131,14 +129,14 @@ export function getSetLoadedAccountsDataSizeLimitInstructionRaw<
 }
 
 export type ParsedSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > = {
   programAddress: Address<TProgram>;
   data: SetLoadedAccountsDataSizeLimitInstructionData;
 };
 
 export function parseSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string
+  TProgram extends string,
 >(
   instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
 ): ParsedSetLoadedAccountsDataSizeLimitInstruction<TProgram> {

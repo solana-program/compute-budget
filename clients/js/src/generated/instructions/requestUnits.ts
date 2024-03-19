@@ -29,14 +29,14 @@ import {
 
 export type RequestUnitsInstruction<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestUnitsInstructionWithSigners<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -96,16 +96,14 @@ export type RequestUnitsInputWithSigners = {
 };
 
 export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(
   input: RequestUnitsInputWithSigners
 ): RequestUnitsInstructionWithSigners<TProgram>;
 export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 >(input: RequestUnitsInput): RequestUnitsInstruction<TProgram>;
-export function getRequestUnitsInstruction(
-  input: RequestUnitsInput
-): IInstruction {
+export function getRequestUnitsInstruction(input: RequestUnitsInput): IInstruction {
   // Program address.
   const programAddress =
     'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
@@ -123,7 +121,7 @@ export function getRequestUnitsInstruction(
 
 export function getRequestUnitsInstructionRaw<
   TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   args: RequestUnitsInstructionDataArgs,
   programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
@@ -137,7 +135,7 @@ export function getRequestUnitsInstructionRaw<
 }
 
 export type ParsedRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > = {
   programAddress: Address<TProgram>;
   data: RequestUnitsInstructionData;

@@ -65,7 +65,7 @@ export function identifyComputeBudgetInstruction(
 }
 
 export type ParsedComputeBudgetInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111'
+  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
 > =
   | ({
       instructionType: ComputeBudgetInstruction.RequestUnits;
