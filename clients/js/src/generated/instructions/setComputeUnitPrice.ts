@@ -26,17 +26,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type SetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
-
-export type SetComputeUnitPriceInstructionWithSigners<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -83,51 +77,27 @@ export type SetComputeUnitPriceInput = {
   microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
 };
 
-export type SetComputeUnitPriceInputWithSigners = {
-  microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
-};
-
-export function getSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
-  input: SetComputeUnitPriceInputWithSigners
-): SetComputeUnitPriceInstructionWithSigners<TProgram>;
-export function getSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(input: SetComputeUnitPriceInput): SetComputeUnitPriceInstruction<TProgram>;
-export function getSetComputeUnitPriceInstruction(input: SetComputeUnitPriceInput): IInstruction {
+export function getSetComputeUnitPriceInstruction(
+  input: SetComputeUnitPriceInput
+): SetComputeUnitPriceInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
   // Program address.
-  const programAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
 
-  const instruction = getSetComputeUnitPriceInstructionRaw(
-    args as SetComputeUnitPriceInstructionDataArgs,
-    programAddress
-  );
+  const instruction = {
+    programAddress,
+    data: getSetComputeUnitPriceInstructionDataEncoder().encode(
+      args as SetComputeUnitPriceInstructionDataArgs
+    ),
+  } as SetComputeUnitPriceInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
 
   return instruction;
 }
 
-export function getSetComputeUnitPriceInstructionRaw<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  args: SetComputeUnitPriceInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getSetComputeUnitPriceInstructionDataEncoder().encode(args),
-    programAddress,
-  } as SetComputeUnitPriceInstruction<TProgram, TRemainingAccounts>;
-}
-
 export type ParsedSetComputeUnitPriceInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 > = {
   programAddress: Address<TProgram>;
   data: SetComputeUnitPriceInstructionData;

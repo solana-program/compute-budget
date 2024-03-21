@@ -26,17 +26,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type RequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
-
-export type RequestUnitsInstructionWithSigners<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -90,52 +84,27 @@ export type RequestUnitsInput = {
   additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
 };
 
-export type RequestUnitsInputWithSigners = {
-  units: RequestUnitsInstructionDataArgs['units'];
-  additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
-};
-
-export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
-  input: RequestUnitsInputWithSigners
-): RequestUnitsInstructionWithSigners<TProgram>;
-export function getRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(input: RequestUnitsInput): RequestUnitsInstruction<TProgram>;
-export function getRequestUnitsInstruction(input: RequestUnitsInput): IInstruction {
+export function getRequestUnitsInstruction(
+  input: RequestUnitsInput
+): RequestUnitsInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
   // Program address.
-  const programAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
 
-  const instruction = getRequestUnitsInstructionRaw(
-    args as RequestUnitsInstructionDataArgs,
-    programAddress
-  );
+  const instruction = {
+    programAddress,
+    data: getRequestUnitsInstructionDataEncoder().encode(
+      args as RequestUnitsInstructionDataArgs
+    ),
+  } as RequestUnitsInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
 
   return instruction;
 }
 
-export function getRequestUnitsInstructionRaw<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  args: RequestUnitsInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getRequestUnitsInstructionDataEncoder().encode(args),
-    programAddress,
-  } as RequestUnitsInstruction<TProgram, TRemainingAccounts>;
-}
-
 export type ParsedRequestUnitsInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 > = {
   programAddress: Address<TProgram>;
   data: RequestUnitsInstructionData;

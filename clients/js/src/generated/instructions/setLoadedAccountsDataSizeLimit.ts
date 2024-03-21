@@ -26,17 +26,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type SetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
-
-export type SetLoadedAccountsDataSizeLimitInstructionWithSigners<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -81,55 +75,31 @@ export type SetLoadedAccountsDataSizeLimitInput = {
   accountDataSizeLimit: SetLoadedAccountsDataSizeLimitInstructionDataArgs['accountDataSizeLimit'];
 };
 
-export type SetLoadedAccountsDataSizeLimitInputWithSigners = {
-  accountDataSizeLimit: SetLoadedAccountsDataSizeLimitInstructionDataArgs['accountDataSizeLimit'];
-};
-
-export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
-  input: SetLoadedAccountsDataSizeLimitInputWithSigners
-): SetLoadedAccountsDataSizeLimitInstructionWithSigners<TProgram>;
-export function getSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
+export function getSetLoadedAccountsDataSizeLimitInstruction(
   input: SetLoadedAccountsDataSizeLimitInput
-): SetLoadedAccountsDataSizeLimitInstruction<TProgram>;
-export function getSetLoadedAccountsDataSizeLimitInstruction(input: SetLoadedAccountsDataSizeLimitInput): IInstruction {
+): SetLoadedAccountsDataSizeLimitInstruction<
+  typeof COMPUTE_BUDGET_PROGRAM_ADDRESS
+> {
   // Program address.
-  const programAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
 
-  const instruction = getSetLoadedAccountsDataSizeLimitInstructionRaw(
-    args as SetLoadedAccountsDataSizeLimitInstructionDataArgs,
-    programAddress
-  );
+  const instruction = {
+    programAddress,
+    data: getSetLoadedAccountsDataSizeLimitInstructionDataEncoder().encode(
+      args as SetLoadedAccountsDataSizeLimitInstructionDataArgs
+    ),
+  } as SetLoadedAccountsDataSizeLimitInstruction<
+    typeof COMPUTE_BUDGET_PROGRAM_ADDRESS
+  >;
 
   return instruction;
 }
 
-export function getSetLoadedAccountsDataSizeLimitInstructionRaw<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  args: SetLoadedAccountsDataSizeLimitInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getSetLoadedAccountsDataSizeLimitInstructionDataEncoder().encode(
-      args
-    ),
-    programAddress,
-  } as SetLoadedAccountsDataSizeLimitInstruction<TProgram, TRemainingAccounts>;
-}
-
 export type ParsedSetLoadedAccountsDataSizeLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 > = {
   programAddress: Address<TProgram>;
   data: SetLoadedAccountsDataSizeLimitInstructionData;

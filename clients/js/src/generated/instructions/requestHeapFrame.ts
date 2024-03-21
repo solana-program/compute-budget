@@ -26,17 +26,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type RequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
-
-export type RequestHeapFrameInstructionWithSigners<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -89,51 +83,27 @@ export type RequestHeapFrameInput = {
   bytes: RequestHeapFrameInstructionDataArgs['bytes'];
 };
 
-export type RequestHeapFrameInputWithSigners = {
-  bytes: RequestHeapFrameInstructionDataArgs['bytes'];
-};
-
-export function getRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
-  input: RequestHeapFrameInputWithSigners
-): RequestHeapFrameInstructionWithSigners<TProgram>;
-export function getRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(input: RequestHeapFrameInput): RequestHeapFrameInstruction<TProgram>;
-export function getRequestHeapFrameInstruction(input: RequestHeapFrameInput): IInstruction {
+export function getRequestHeapFrameInstruction(
+  input: RequestHeapFrameInput
+): RequestHeapFrameInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
   // Program address.
-  const programAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
 
-  const instruction = getRequestHeapFrameInstructionRaw(
-    args as RequestHeapFrameInstructionDataArgs,
-    programAddress
-  );
+  const instruction = {
+    programAddress,
+    data: getRequestHeapFrameInstructionDataEncoder().encode(
+      args as RequestHeapFrameInstructionDataArgs
+    ),
+  } as RequestHeapFrameInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
 
   return instruction;
 }
 
-export function getRequestHeapFrameInstructionRaw<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  args: RequestHeapFrameInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getRequestHeapFrameInstructionDataEncoder().encode(args),
-    programAddress,
-  } as RequestHeapFrameInstruction<TProgram, TRemainingAccounts>;
-}
-
 export type ParsedRequestHeapFrameInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 > = {
   programAddress: Address<TProgram>;
   data: RequestHeapFrameInstructionData;

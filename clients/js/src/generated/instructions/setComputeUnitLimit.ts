@@ -26,17 +26,11 @@ import {
   IInstructionWithAccounts,
   IInstructionWithData,
 } from '@solana/instructions';
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type SetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
-
-export type SetComputeUnitLimitInstructionWithSigners<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<TRemainingAccounts>;
@@ -83,51 +77,27 @@ export type SetComputeUnitLimitInput = {
   units: SetComputeUnitLimitInstructionDataArgs['units'];
 };
 
-export type SetComputeUnitLimitInputWithSigners = {
-  units: SetComputeUnitLimitInstructionDataArgs['units'];
-};
-
-export function getSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(
-  input: SetComputeUnitLimitInputWithSigners
-): SetComputeUnitLimitInstructionWithSigners<TProgram>;
-export function getSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
->(input: SetComputeUnitLimitInput): SetComputeUnitLimitInstruction<TProgram>;
-export function getSetComputeUnitLimitInstruction(input: SetComputeUnitLimitInput): IInstruction {
+export function getSetComputeUnitLimitInstruction(
+  input: SetComputeUnitLimitInput
+): SetComputeUnitLimitInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
   // Program address.
-  const programAddress =
-    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
 
-  const instruction = getSetComputeUnitLimitInstructionRaw(
-    args as SetComputeUnitLimitInstructionDataArgs,
-    programAddress
-  );
+  const instruction = {
+    programAddress,
+    data: getSetComputeUnitLimitInstructionDataEncoder().encode(
+      args as SetComputeUnitLimitInstructionDataArgs
+    ),
+  } as SetComputeUnitLimitInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
 
   return instruction;
 }
 
-export function getSetComputeUnitLimitInstructionRaw<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  args: SetComputeUnitLimitInstructionDataArgs,
-  programAddress: Address<TProgram> = 'ComputeBudget111111111111111111111111111111' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: remainingAccounts ?? [],
-    data: getSetComputeUnitLimitInstructionDataEncoder().encode(args),
-    programAddress,
-  } as SetComputeUnitLimitInstruction<TProgram, TRemainingAccounts>;
-}
-
 export type ParsedSetComputeUnitLimitInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
+  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 > = {
   programAddress: Address<TProgram>;
   data: SetComputeUnitLimitInstructionData;
