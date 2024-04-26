@@ -41,12 +41,12 @@ impl SetComputeUnitPrice {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct SetComputeUnitPriceInstructionData {
+pub struct SetComputeUnitPriceInstructionData {
     discriminator: u8,
 }
 
 impl SetComputeUnitPriceInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 3 }
     }
 }
@@ -61,7 +61,7 @@ pub struct SetComputeUnitPriceInstructionArgs {
 ///
 /// ### Accounts:
 ///
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct SetComputeUnitPriceBuilder {
     micro_lamports: Option<u64>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -196,6 +196,7 @@ impl<'a, 'b> SetComputeUnitPriceCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
+#[derive(Clone, Debug)]
 pub struct SetComputeUnitPriceCpiBuilder<'a, 'b> {
     instruction: Box<SetComputeUnitPriceCpiBuilderInstruction<'a, 'b>>,
 }
@@ -273,6 +274,7 @@ impl<'a, 'b> SetComputeUnitPriceCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct SetComputeUnitPriceCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     micro_lamports: Option<u64>,

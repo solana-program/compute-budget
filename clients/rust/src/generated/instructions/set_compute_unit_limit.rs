@@ -41,12 +41,12 @@ impl SetComputeUnitLimit {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct SetComputeUnitLimitInstructionData {
+pub struct SetComputeUnitLimitInstructionData {
     discriminator: u8,
 }
 
 impl SetComputeUnitLimitInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 2 }
     }
 }
@@ -61,7 +61,7 @@ pub struct SetComputeUnitLimitInstructionArgs {
 ///
 /// ### Accounts:
 ///
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct SetComputeUnitLimitBuilder {
     units: Option<u32>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -193,6 +193,7 @@ impl<'a, 'b> SetComputeUnitLimitCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
+#[derive(Clone, Debug)]
 pub struct SetComputeUnitLimitCpiBuilder<'a, 'b> {
     instruction: Box<SetComputeUnitLimitCpiBuilderInstruction<'a, 'b>>,
 }
@@ -266,6 +267,7 @@ impl<'a, 'b> SetComputeUnitLimitCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct SetComputeUnitLimitCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     units: Option<u32>,

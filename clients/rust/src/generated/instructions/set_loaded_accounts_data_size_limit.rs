@@ -41,12 +41,12 @@ impl SetLoadedAccountsDataSizeLimit {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct SetLoadedAccountsDataSizeLimitInstructionData {
+pub struct SetLoadedAccountsDataSizeLimitInstructionData {
     discriminator: u8,
 }
 
 impl SetLoadedAccountsDataSizeLimitInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 4 }
     }
 }
@@ -61,7 +61,7 @@ pub struct SetLoadedAccountsDataSizeLimitInstructionArgs {
 ///
 /// ### Accounts:
 ///
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct SetLoadedAccountsDataSizeLimitBuilder {
     account_data_size_limit: Option<u32>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -196,6 +196,7 @@ impl<'a, 'b> SetLoadedAccountsDataSizeLimitCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
+#[derive(Clone, Debug)]
 pub struct SetLoadedAccountsDataSizeLimitCpiBuilder<'a, 'b> {
     instruction: Box<SetLoadedAccountsDataSizeLimitCpiBuilderInstruction<'a, 'b>>,
 }
@@ -273,6 +274,7 @@ impl<'a, 'b> SetLoadedAccountsDataSizeLimitCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct SetLoadedAccountsDataSizeLimitCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     account_data_size_limit: Option<u32>,

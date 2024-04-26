@@ -6,9 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
-import { getU8Encoder } from '@solana/codecs';
-import { Program } from '@solana/programs';
+import { Address, containsBytes, getU8Encoder } from '@solana/web3.js';
 import {
   ParsedRequestHeapFrameInstruction,
   ParsedRequestUnitsInstruction,
@@ -16,20 +14,9 @@ import {
   ParsedSetComputeUnitPriceInstruction,
   ParsedSetLoadedAccountsDataSizeLimitInstruction,
 } from '../instructions';
-import { memcmp } from '../shared';
 
 export const COMPUTE_BUDGET_PROGRAM_ADDRESS =
   'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
-
-export type ComputeBudgetProgram =
-  Program<'ComputeBudget111111111111111111111111111111'>;
-
-export function getComputeBudgetProgram(): ComputeBudgetProgram {
-  return {
-    name: 'computeBudget',
-    address: COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  };
-}
 
 export enum ComputeBudgetInstruction {
   RequestUnits,
@@ -44,19 +31,19 @@ export function identifyComputeBudgetInstruction(
 ): ComputeBudgetInstruction {
   const data =
     instruction instanceof Uint8Array ? instruction : instruction.data;
-  if (memcmp(data, getU8Encoder().encode(0), 0)) {
+  if (containsBytes(data, getU8Encoder().encode(0), 0)) {
     return ComputeBudgetInstruction.RequestUnits;
   }
-  if (memcmp(data, getU8Encoder().encode(1), 0)) {
+  if (containsBytes(data, getU8Encoder().encode(1), 0)) {
     return ComputeBudgetInstruction.RequestHeapFrame;
   }
-  if (memcmp(data, getU8Encoder().encode(2), 0)) {
+  if (containsBytes(data, getU8Encoder().encode(2), 0)) {
     return ComputeBudgetInstruction.SetComputeUnitLimit;
   }
-  if (memcmp(data, getU8Encoder().encode(3), 0)) {
+  if (containsBytes(data, getU8Encoder().encode(3), 0)) {
     return ComputeBudgetInstruction.SetComputeUnitPrice;
   }
-  if (memcmp(data, getU8Encoder().encode(4), 0)) {
+  if (containsBytes(data, getU8Encoder().encode(4), 0)) {
     return ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
   }
   throw new Error(
