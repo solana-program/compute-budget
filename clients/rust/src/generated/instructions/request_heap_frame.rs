@@ -39,12 +39,12 @@ impl RequestHeapFrame {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct RequestHeapFrameInstructionData {
+pub struct RequestHeapFrameInstructionData {
     discriminator: u8,
 }
 
 impl RequestHeapFrameInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 1 }
     }
 }
@@ -59,7 +59,7 @@ pub struct RequestHeapFrameInstructionArgs {
 ///
 /// ### Accounts:
 ///
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct RequestHeapFrameBuilder {
     bytes: Option<u32>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -189,6 +189,7 @@ impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
+#[derive(Clone, Debug)]
 pub struct RequestHeapFrameCpiBuilder<'a, 'b> {
     instruction: Box<RequestHeapFrameCpiBuilderInstruction<'a, 'b>>,
 }
@@ -262,6 +263,7 @@ impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct RequestHeapFrameCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     bytes: Option<u32>,

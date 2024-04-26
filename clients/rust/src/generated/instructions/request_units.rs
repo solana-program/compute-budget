@@ -39,12 +39,12 @@ impl RequestUnits {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct RequestUnitsInstructionData {
+pub struct RequestUnitsInstructionData {
     discriminator: u8,
 }
 
 impl RequestUnitsInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { discriminator: 0 }
     }
 }
@@ -60,7 +60,7 @@ pub struct RequestUnitsInstructionArgs {
 ///
 /// ### Accounts:
 ///
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct RequestUnitsBuilder {
     units: Option<u32>,
     additional_fee: Option<u32>,
@@ -200,6 +200,7 @@ impl<'a, 'b> RequestUnitsCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
+#[derive(Clone, Debug)]
 pub struct RequestUnitsCpiBuilder<'a, 'b> {
     instruction: Box<RequestUnitsCpiBuilderInstruction<'a, 'b>>,
 }
@@ -284,6 +285,7 @@ impl<'a, 'b> RequestUnitsCpiBuilder<'a, 'b> {
     }
 }
 
+#[derive(Clone, Debug)]
 struct RequestUnitsCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     units: Option<u32>,

@@ -6,11 +6,15 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Address } from '@solana/addresses';
 import {
+  Address,
   Codec,
   Decoder,
   Encoder,
+  IAccountMeta,
+  IInstruction,
+  IInstructionWithAccounts,
+  IInstructionWithData,
   combineCodec,
   getStructDecoder,
   getStructEncoder,
@@ -18,14 +22,8 @@ import {
   getU32Encoder,
   getU8Decoder,
   getU8Encoder,
-  mapEncoder,
-} from '@solana/codecs';
-import {
-  IAccountMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-} from '@solana/instructions';
+  transformEncoder,
+} from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export type RequestUnitsInstruction<
@@ -51,7 +49,7 @@ export type RequestUnitsInstructionDataArgs = {
 };
 
 export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsInstructionDataArgs> {
-  return mapEncoder(
+  return transformEncoder(
     getStructEncoder([
       ['discriminator', getU8Encoder()],
       ['units', getU32Encoder()],

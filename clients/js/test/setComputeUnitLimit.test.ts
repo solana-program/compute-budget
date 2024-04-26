@@ -1,4 +1,4 @@
-import { appendTransactionInstruction, pipe } from '@solana/web3.js';
+import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
 import test from 'ava';
 import { getSetComputeUnitLimitInstruction } from '../src/index.js';
 import {
@@ -17,7 +17,7 @@ test('it sets the compute unit limit of a transaction', async (t) => {
   const setComputeUnit = getSetComputeUnitLimitInstruction({ units: 600_000 });
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(setComputeUnit, tx),
+    (tx) => appendTransactionMessageInstruction(setComputeUnit, tx),
     async (tx) => signAndSendTransaction(client, tx)
   );
 
