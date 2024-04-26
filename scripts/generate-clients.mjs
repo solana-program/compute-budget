@@ -4,8 +4,8 @@ import * as k from "@metaplex-foundation/kinobi";
 import { workingDirectory } from "./utils.mjs";
 
 // Instanciate Kinobi.
-const kinobi = k.createFromIdl(
-  path.join(workingDirectory, "program", "idl.json")
+const kinobi = k.createFromRoot(
+  require(path.join(workingDirectory, "program", "idl.json"))
 );
 
 // Render JavaScript.
