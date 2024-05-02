@@ -1,12 +1,12 @@
 import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
 import test from 'ava';
-import { getSetComputeUnitLimitInstruction } from '../src/index.js';
+import { getSetComputeUnitLimitInstruction } from '../src';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup.js';
+} from './_setup';
 
 test('it sets the compute unit limit of a transaction', async (t) => {
   // Given a payer wallet.
