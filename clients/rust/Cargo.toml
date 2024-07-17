@@ -1,5 +1,5 @@
 [package]
-name = "solana-compute-budget"
+name = "solana-compute-budget-client"
 version = "0.0.0"
 edition = "2021"
 readme = "README.md"

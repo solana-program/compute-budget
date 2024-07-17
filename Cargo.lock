@@ -3720,7 +3720,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "solana-compute-budget"
+name = "solana-compute-budget-client"
 version = "0.0.0"
 dependencies = [
  "assert_matches",
