@@ -18,7 +18,7 @@ test('it sets the compute unit limit of a transaction', async (t) => {
   await pipe(
     await createDefaultTransaction(client, payer),
     (tx) => appendTransactionMessageInstruction(setComputeUnit, tx),
-    async (tx) => signAndSendTransaction(client, tx)
+    (tx) => signAndSendTransaction(client, tx)
   );
 
   // Then the transaction was successful.
