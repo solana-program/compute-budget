@@ -1,6 +1,8 @@
 [package]
 name = "solana-compute-budget-client"
 version = "0.0.0"
+description = "A generated Rust library for the Compute Budget program"
+repository = "https://github.com/solana-program/compute-budget"
 edition = "2021"
 readme = "README.md"
 license-file = "../../LICENSE"
