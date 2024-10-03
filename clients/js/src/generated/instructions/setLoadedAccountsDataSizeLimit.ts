@@ -26,6 +26,14 @@ import {
 } from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
+export const SET_LOADED_ACCOUNTS_DATA_SIZE_LIMIT_DISCRIMINATOR = 4;
+
+export function getSetLoadedAccountsDataSizeLimitDiscriminatorBytes() {
+  return getU8Encoder().encode(
+    SET_LOADED_ACCOUNTS_DATA_SIZE_LIMIT_DISCRIMINATOR
+  );
+}
+
 export type SetLoadedAccountsDataSizeLimitInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
@@ -48,7 +56,10 @@ export function getSetLoadedAccountsDataSizeLimitInstructionDataEncoder(): Encod
       ['discriminator', getU8Encoder()],
       ['accountDataSizeLimit', getU32Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 4 })
+    (value) => ({
+      ...value,
+      discriminator: SET_LOADED_ACCOUNTS_DATA_SIZE_LIMIT_DISCRIMINATOR,
+    })
   );
 }
 
@@ -73,13 +84,15 @@ export type SetLoadedAccountsDataSizeLimitInput = {
   accountDataSizeLimit: SetLoadedAccountsDataSizeLimitInstructionDataArgs['accountDataSizeLimit'];
 };
 
-export function getSetLoadedAccountsDataSizeLimitInstruction(
-  input: SetLoadedAccountsDataSizeLimitInput
-): SetLoadedAccountsDataSizeLimitInstruction<
-  typeof COMPUTE_BUDGET_PROGRAM_ADDRESS
-> {
+export function getSetLoadedAccountsDataSizeLimitInstruction<
+  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+>(
+  input: SetLoadedAccountsDataSizeLimitInput,
+  config?: { programAddress?: TProgramAddress }
+): SetLoadedAccountsDataSizeLimitInstruction<TProgramAddress> {
   // Program address.
-  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
@@ -89,9 +102,7 @@ export function getSetLoadedAccountsDataSizeLimitInstruction(
     data: getSetLoadedAccountsDataSizeLimitInstructionDataEncoder().encode(
       args as SetLoadedAccountsDataSizeLimitInstructionDataArgs
     ),
-  } as SetLoadedAccountsDataSizeLimitInstruction<
-    typeof COMPUTE_BUDGET_PROGRAM_ADDRESS
-  >;
+  } as SetLoadedAccountsDataSizeLimitInstruction<TProgramAddress>;
 
   return instruction;
 }

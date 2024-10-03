@@ -26,6 +26,12 @@ import {
 } from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
+export const REQUEST_UNITS_DISCRIMINATOR = 0;
+
+export function getRequestUnitsDiscriminatorBytes() {
+  return getU8Encoder().encode(REQUEST_UNITS_DISCRIMINATOR);
+}
+
 export type RequestUnitsInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
@@ -55,7 +61,7 @@ export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsIns
       ['units', getU32Encoder()],
       ['additionalFee', getU32Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 0 })
+    (value) => ({ ...value, discriminator: REQUEST_UNITS_DISCRIMINATOR })
   );
 }
 
@@ -82,11 +88,15 @@ export type RequestUnitsInput = {
   additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
 };
 
-export function getRequestUnitsInstruction(
-  input: RequestUnitsInput
-): RequestUnitsInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
+export function getRequestUnitsInstruction<
+  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+>(
+  input: RequestUnitsInput,
+  config?: { programAddress?: TProgramAddress }
+): RequestUnitsInstruction<TProgramAddress> {
   // Program address.
-  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
@@ -96,7 +106,7 @@ export function getRequestUnitsInstruction(
     data: getRequestUnitsInstructionDataEncoder().encode(
       args as RequestUnitsInstructionDataArgs
     ),
-  } as RequestUnitsInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
+  } as RequestUnitsInstruction<TProgramAddress>;
 
   return instruction;
 }
