@@ -26,6 +26,12 @@ import {
 } from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
+export const REQUEST_HEAP_FRAME_DISCRIMINATOR = 1;
+
+export function getRequestHeapFrameDiscriminatorBytes() {
+  return getU8Encoder().encode(REQUEST_HEAP_FRAME_DISCRIMINATOR);
+}
+
 export type RequestHeapFrameInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
@@ -56,7 +62,7 @@ export function getRequestHeapFrameInstructionDataEncoder(): Encoder<RequestHeap
       ['discriminator', getU8Encoder()],
       ['bytes', getU32Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 1 })
+    (value) => ({ ...value, discriminator: REQUEST_HEAP_FRAME_DISCRIMINATOR })
   );
 }
 
@@ -81,11 +87,15 @@ export type RequestHeapFrameInput = {
   bytes: RequestHeapFrameInstructionDataArgs['bytes'];
 };
 
-export function getRequestHeapFrameInstruction(
-  input: RequestHeapFrameInput
-): RequestHeapFrameInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
+export function getRequestHeapFrameInstruction<
+  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+>(
+  input: RequestHeapFrameInput,
+  config?: { programAddress?: TProgramAddress }
+): RequestHeapFrameInstruction<TProgramAddress> {
   // Program address.
-  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
@@ -95,7 +105,7 @@ export function getRequestHeapFrameInstruction(
     data: getRequestHeapFrameInstructionDataEncoder().encode(
       args as RequestHeapFrameInstructionDataArgs
     ),
-  } as RequestHeapFrameInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
+  } as RequestHeapFrameInstruction<TProgramAddress>;
 
   return instruction;
 }

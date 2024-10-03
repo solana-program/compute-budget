@@ -26,6 +26,12 @@ import {
 } from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
+export const SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR = 2;
+
+export function getSetComputeUnitLimitDiscriminatorBytes() {
+  return getU8Encoder().encode(SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR);
+}
+
 export type SetComputeUnitLimitInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
@@ -50,7 +56,10 @@ export function getSetComputeUnitLimitInstructionDataEncoder(): Encoder<SetCompu
       ['discriminator', getU8Encoder()],
       ['units', getU32Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({
+      ...value,
+      discriminator: SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR,
+    })
   );
 }
 
@@ -75,11 +84,15 @@ export type SetComputeUnitLimitInput = {
   units: SetComputeUnitLimitInstructionDataArgs['units'];
 };
 
-export function getSetComputeUnitLimitInstruction(
-  input: SetComputeUnitLimitInput
-): SetComputeUnitLimitInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
+export function getSetComputeUnitLimitInstruction<
+  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+>(
+  input: SetComputeUnitLimitInput,
+  config?: { programAddress?: TProgramAddress }
+): SetComputeUnitLimitInstruction<TProgramAddress> {
   // Program address.
-  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
@@ -89,7 +102,7 @@ export function getSetComputeUnitLimitInstruction(
     data: getSetComputeUnitLimitInstructionDataEncoder().encode(
       args as SetComputeUnitLimitInstructionDataArgs
     ),
-  } as SetComputeUnitLimitInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
+  } as SetComputeUnitLimitInstruction<TProgramAddress>;
 
   return instruction;
 }

@@ -26,6 +26,12 @@ import {
 } from '@solana/web3.js';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
+export const SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR = 3;
+
+export function getSetComputeUnitPriceDiscriminatorBytes() {
+  return getU8Encoder().encode(SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR);
+}
+
 export type SetComputeUnitPriceInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
   TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
@@ -50,7 +56,10 @@ export function getSetComputeUnitPriceInstructionDataEncoder(): Encoder<SetCompu
       ['discriminator', getU8Encoder()],
       ['microLamports', getU64Encoder()],
     ]),
-    (value) => ({ ...value, discriminator: 3 })
+    (value) => ({
+      ...value,
+      discriminator: SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR,
+    })
   );
 }
 
@@ -75,11 +84,15 @@ export type SetComputeUnitPriceInput = {
   microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
 };
 
-export function getSetComputeUnitPriceInstruction(
-  input: SetComputeUnitPriceInput
-): SetComputeUnitPriceInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> {
+export function getSetComputeUnitPriceInstruction<
+  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+>(
+  input: SetComputeUnitPriceInput,
+  config?: { programAddress?: TProgramAddress }
+): SetComputeUnitPriceInstruction<TProgramAddress> {
   // Program address.
-  const programAddress = COMPUTE_BUDGET_PROGRAM_ADDRESS;
+  const programAddress =
+    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
   // Original args.
   const args = { ...input };
@@ -89,7 +102,7 @@ export function getSetComputeUnitPriceInstruction(
     data: getSetComputeUnitPriceInstructionDataEncoder().encode(
       args as SetComputeUnitPriceInstructionDataArgs
     ),
-  } as SetComputeUnitPriceInstruction<typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>;
+  } as SetComputeUnitPriceInstruction<TProgramAddress>;
 
   return instruction;
 }
