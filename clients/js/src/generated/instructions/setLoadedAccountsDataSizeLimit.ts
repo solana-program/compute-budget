@@ -23,7 +23,7 @@ import {
   type IInstruction,
   type IInstructionWithAccounts,
   type IInstructionWithData,
-} from '@solana/web3.js';
+} from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_LOADED_ACCOUNTS_DATA_SIZE_LIMIT_DISCRIMINATOR = 4;

@@ -23,7 +23,7 @@ import {
   type IInstruction,
   type IInstructionWithAccounts,
   type IInstructionWithData,
-} from '@solana/web3.js';
+} from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR = 3;

@@ -1,4 +1,4 @@
-import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
+import { appendTransactionMessageInstruction, pipe } from '@solana/kit';
 import test from 'ava';
 import { getSetComputeUnitLimitInstruction } from '../src';
 import {

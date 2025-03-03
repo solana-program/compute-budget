@@ -9,6 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
+#[derive(Debug)]
 pub struct RequestUnits {}
 
 impl RequestUnits {
@@ -24,10 +25,10 @@ impl RequestUnits {
         args: RequestUnitsInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(0 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(remaining_accounts.len());
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = RequestUnitsInstructionData::new().try_to_vec().unwrap();
-        let mut args = args.try_to_vec().unwrap();
+        let mut data = borsh::to_vec(&RequestUnitsInstructionData::new()).unwrap();
+        let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
         solana_program::instruction::Instruction {
@@ -38,7 +39,8 @@ impl RequestUnits {
     }
 }
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RequestUnitsInstructionData {
     discriminator: u8,
 }
@@ -171,7 +173,7 @@ impl<'a, 'b> RequestUnitsCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(0 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(remaining_accounts.len());
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -179,8 +181,8 @@ impl<'a, 'b> RequestUnitsCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = RequestUnitsInstructionData::new().try_to_vec().unwrap();
-        let mut args = self.__args.try_to_vec().unwrap();
+        let mut data = borsh::to_vec(&RequestUnitsInstructionData::new()).unwrap();
+        let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
         let instruction = solana_program::instruction::Instruction {
@@ -188,7 +190,7 @@ impl<'a, 'b> RequestUnitsCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(0 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         remaining_accounts
             .iter()
