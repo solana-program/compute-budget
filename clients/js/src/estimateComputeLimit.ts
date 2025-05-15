@@ -41,13 +41,11 @@ import {
  * @example
  * ```ts
  * import { getSetComputeUnitLimitInstruction } from '@solana-program/compute-budget';
- * import { createSolanaRpc, getComputeUnitEstimateForTransactionMessageFactory, pipe } from '@solana/kit';
+ * import { createSolanaRpc, estimateComputeUnitLimitFactory, pipe } from '@solana/kit';
  *
  * // Create an estimator function.
  * const rpc = createSolanaRpc('http://127.0.0.1:8899');
- * const getComputeUnitEstimateForTransactionMessage = getComputeUnitEstimateForTransactionMessageFactory({
- *     rpc,
- * });
+ * const estimateComputeUnitLimit = estimateComputeUnitLimitFactory({ rpc });
  *
  * // Create your transaction message.
  * const transactionMessage = pipe(
@@ -57,11 +55,11 @@ import {
  *
  * // Request an estimate of the actual compute units this message will consume. This is done by
  * // simulating the transaction and grabbing the estimated compute units from the result.
- * const computeUnitsEstimate = await getComputeUnitEstimateForTransactionMessage(transactionMessage);
+ * const estimatedUnits = await estimateComputeUnitLimit(transactionMessage);
  *
  * // Set the transaction message's compute unit budget.
  * const transactionMessageWithComputeUnitLimit = prependTransactionMessageInstruction(
- *     getSetComputeUnitLimitInstruction({ units: computeUnitsEstimate }),
+ *     getSetComputeUnitLimitInstruction({ units: estimatedUnits }),
  *     transactionMessage,
  * );
  * ```

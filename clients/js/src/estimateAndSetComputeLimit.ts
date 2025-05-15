@@ -32,12 +32,14 @@ type EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction = <
  *
  * @example
  * ```ts
- * const estimateComputeUnitLimit = estimateComputeUnitLimitFactory({ rpc });
- * const estimateAndUpdateProvisoryComputeUnitLimit =
- *   estimateAndUpdateProvisoryComputeUnitLimitFactory(estimateComputeUnitLimit);
- * const estimatedTransactionMessage =
- *   await estimateAndUpdateProvisoryComputeUnitLimit(transactionMessage)
+ * const estimateAndUpdateCUs = estimateAndUpdateProvisoryComputeUnitLimitFactory(
+ *     estimateComputeUnitLimitFactory({ rpc })
+ * );
+ *
+ * const transactionMessageWithCUs = await estimateAndUpdateCUs(transactionMessage);
  * ```
+ *
+ * @see {@link estimateAndUpdateProvisoryComputeUnitLimitFactory}
  */
 export function estimateAndUpdateProvisoryComputeUnitLimitFactory(
   estimateComputeUnitLimit: EstimateComputeUnitLimitFactoryFunction
