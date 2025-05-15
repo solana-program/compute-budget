@@ -2,6 +2,7 @@ import {
   AccountRole,
   Address,
   Blockhash,
+  compileTransaction,
   ITransactionMessageWithFeePayer,
   Nonce,
   Rpc,
@@ -12,9 +13,12 @@ import {
   SolanaError,
   TransactionError,
   TransactionMessage,
-  compileTransaction,
 } from '@solana/kit';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import {
+  getSetComputeUnitLimitInstruction,
+  MAX_COMPUTE_UNIT_LIMIT,
+} from '../src';
 import { estimateComputeUnitLimit } from '../src/estimateComputeLimitInternal';
 
 // Spy on the `compileTransaction` function.
@@ -114,43 +118,21 @@ describe('estimateComputeUnitLimit', () => {
       ...transactionMessage,
       instructions: [
         ...transactionMessage.instructions,
-        {
-          data:
-            // prettier-ignore
-            new Uint8Array([
-              0x02, // SetComputeUnitLimit instruction inde
-              0xc0, 0x5c, 0x15, 0x00, // 1,400,000, MAX_COMPUTE_UNITS
-            ]),
-          programAddress: 'ComputeBudget111111111111111111111111111111',
-        },
+        getSetComputeUnitLimitInstruction({ units: MAX_COMPUTE_UNIT_LIMIT }),
       ],
     });
-
-    vi.doUnmock('@solana/kit');
   });
 
   it('replaces the existing set compute unit limit instruction when one exists', () => {
+    const mockInstruction = {
+      programAddress: '4Kk4nA3F2nWHCcuyT8nR6oF7HQUQHmmzAVD5k8FQPKB2' as Address,
+    };
     const transactionMessage = {
       ...mockTransactionMessage,
       instructions: [
-        {
-          programAddress:
-            '4Kk4nA3F2nWHCcuyT8nR6oF7HQUQHmmzAVD5k8FQPKB2' as Address,
-        },
-        {
-          data:
-            // prettier-ignore
-            new Uint8Array([
-              0x02, // SetComputeUnitLimit instruction inde
-              0x01, 0x02, 0x03, 0x04, // ComputeUnits(u32)
-            ]),
-          programAddress:
-            'ComputeBudget111111111111111111111111111111' as Address,
-        },
-        {
-          programAddress:
-            '4Kk4nA3F2nWHCcuyT8nR6oF7HQUQHmmzAVD5k8FQPKB2' as Address,
-        },
+        mockInstruction,
+        getSetComputeUnitLimitInstruction({ units: 1234 }),
+        mockInstruction,
       ],
       lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
     };
@@ -163,12 +145,9 @@ describe('estimateComputeUnitLimit', () => {
     expect(compileTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
         instructions: [
-          transactionMessage.instructions[0],
-          {
-            ...transactionMessage.instructions[1],
-            data: new Uint8Array([0x02, 0xc0, 0x5c, 0x15, 0x00]), // Replaced with MAX_COMPUTE_UNITS
-          },
-          transactionMessage.instructions[2],
+          mockInstruction,
+          getSetComputeUnitLimitInstruction({ units: MAX_COMPUTE_UNIT_LIMIT }),
+          mockInstruction,
         ],
       })
     );
