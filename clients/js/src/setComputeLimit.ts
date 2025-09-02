@@ -63,7 +63,7 @@ export function updateOrAppendSetComputeUnitLimitInstruction<
     return appendTransactionMessageInstruction(
       getSetComputeUnitLimitInstruction({ units: getUnits(null) }),
       transactionMessage
-    );
+    ) as unknown as TTransactionMessage;
   }
 
   const { index, units: previousUnits } = instructionDetails;

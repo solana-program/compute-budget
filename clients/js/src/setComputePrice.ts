@@ -68,7 +68,7 @@ export function updateOrAppendSetComputeUnitPriceInstruction<
         microLamports: getMicroLamports(null),
       }),
       transactionMessage
-    );
+    ) as unknown as TTransactionMessage;
   }
 
   const { index, microLamports: previousMicroLamports } = instructionDetails;

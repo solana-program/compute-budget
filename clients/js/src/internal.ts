@@ -2,7 +2,7 @@ import {
   BaseTransactionMessage,
   getU32Decoder,
   getU64Decoder,
-  IInstruction,
+  Instruction,
   MicroLamports,
   ReadonlyUint8Array,
 } from '@solana/kit';
@@ -49,7 +49,7 @@ export function getSetComputeUnitLimitInstructionIndex(
  * Checks if the given instruction is a `SetComputeUnitLimit` instruction.
  */
 export function isSetComputeUnitLimitInstruction(
-  instruction: IInstruction
+  instruction: Instruction
 ): instruction is SetComputeUnitLimitInstruction {
   return (
     instruction.programAddress === COMPUTE_BUDGET_PROGRAM_ADDRESS &&
@@ -93,7 +93,7 @@ export function getSetComputeUnitPriceInstructionIndex(
  * Checks if the given instruction is a `SetComputeUnitPrice` instruction.
  */
 export function isSetComputeUnitPriceInstruction(
-  instruction: IInstruction
+  instruction: Instruction
 ): instruction is SetComputeUnitPriceInstruction {
   return (
     instruction.programAddress === COMPUTE_BUDGET_PROGRAM_ADDRESS &&

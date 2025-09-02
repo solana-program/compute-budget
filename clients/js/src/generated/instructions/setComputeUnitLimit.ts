@@ -15,14 +15,15 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type AccountMeta,
   type Address,
-  type Codec,
-  type Decoder,
-  type Encoder,
-  type IAccountMeta,
-  type IInstruction,
-  type IInstructionWithAccounts,
-  type IInstructionWithData,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
@@ -34,10 +35,10 @@ export function getSetComputeUnitLimitDiscriminatorBytes() {
 
 export type SetComputeUnitLimitInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> &
+  InstructionWithData<ReadonlyUint8Array> &
+  InstructionWithAccounts<TRemainingAccounts>;
 
 export type SetComputeUnitLimitInstructionData = {
   discriminator: number;
@@ -50,7 +51,7 @@ export type SetComputeUnitLimitInstructionDataArgs = {
   units: number;
 };
 
-export function getSetComputeUnitLimitInstructionDataEncoder(): Encoder<SetComputeUnitLimitInstructionDataArgs> {
+export function getSetComputeUnitLimitInstructionDataEncoder(): FixedSizeEncoder<SetComputeUnitLimitInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ['discriminator', getU8Encoder()],
@@ -63,14 +64,14 @@ export function getSetComputeUnitLimitInstructionDataEncoder(): Encoder<SetCompu
   );
 }
 
-export function getSetComputeUnitLimitInstructionDataDecoder(): Decoder<SetComputeUnitLimitInstructionData> {
+export function getSetComputeUnitLimitInstructionDataDecoder(): FixedSizeDecoder<SetComputeUnitLimitInstructionData> {
   return getStructDecoder([
     ['discriminator', getU8Decoder()],
     ['units', getU32Decoder()],
   ]);
 }
 
-export function getSetComputeUnitLimitInstructionDataCodec(): Codec<
+export function getSetComputeUnitLimitInstructionDataCodec(): FixedSizeCodec<
   SetComputeUnitLimitInstructionDataArgs,
   SetComputeUnitLimitInstructionData
 > {
@@ -115,7 +116,7 @@ export type ParsedSetComputeUnitLimitInstruction<
 };
 
 export function parseSetComputeUnitLimitInstruction<TProgram extends string>(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
 ): ParsedSetComputeUnitLimitInstruction<TProgram> {
   return {
     programAddress: instruction.programAddress,

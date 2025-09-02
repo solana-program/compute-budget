@@ -1,9 +1,9 @@
 import {
   AccountRole,
   Address,
+  BaseTransactionMessage,
   Blockhash,
   compileTransaction,
-  ITransactionMessageWithFeePayer,
   Nonce,
   Rpc,
   SimulateTransactionApi,
@@ -12,7 +12,7 @@ import {
   SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
   SolanaError,
   TransactionError,
-  TransactionMessage,
+  TransactionMessageWithFeePayer,
 } from '@solana/kit';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
@@ -41,8 +41,8 @@ const MOCK_BLOCKHASH_LIFETIME_CONSTRAINT = {
 
 describe('estimateComputeUnitLimit', () => {
   let sendSimulateTransactionRequest: Mock;
-  let mockTransactionMessage: TransactionMessage &
-    ITransactionMessageWithFeePayer;
+  let mockTransactionMessage: BaseTransactionMessage &
+    TransactionMessageWithFeePayer;
   let rpc: Rpc<SimulateTransactionApi>;
   let simulateTransaction: Mock;
 
@@ -63,13 +63,14 @@ describe('estimateComputeUnitLimit', () => {
 
   it('aborts the `simulateTransaction` request when aborted', () => {
     const abortController = new AbortController();
+    const transactionMessage = {
+      ...mockTransactionMessage,
+      lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
+    };
     estimateComputeUnitLimit({
       abortSignal: abortController.signal,
       rpc,
-      transactionMessage: {
-        ...mockTransactionMessage,
-        lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
-      },
+      transactionMessage,
     }).catch(() => {});
 
     expect(sendSimulateTransactionRequest).toHaveBeenCalledWith({
@@ -82,14 +83,15 @@ describe('estimateComputeUnitLimit', () => {
   });
 
   it('passes the expected basic input to the simulation request', () => {
+    const transactionMessage = {
+      ...mockTransactionMessage,
+      lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
+    };
     estimateComputeUnitLimit({
       commitment: 'finalized',
       minContextSlot: 42n,
       rpc,
-      transactionMessage: {
-        ...mockTransactionMessage,
-        lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
-      },
+      transactionMessage,
     }).catch(() => {});
 
     expect(simulateTransaction).toHaveBeenCalledWith(
@@ -154,38 +156,35 @@ describe('estimateComputeUnitLimit', () => {
   });
 
   it('does not ask for a replacement blockhash when the transaction message is a durable nonce transaction', () => {
-    estimateComputeUnitLimit({
-      rpc,
-      transactionMessage: {
-        ...mockTransactionMessage,
-        instructions: [
-          {
-            accounts: [
-              {
-                address:
-                  '7wJFRFuAE9x5Ptnz2VoBWsfecTCfuuM2sQCpECGypnTU' as Address,
-                role: AccountRole.WRITABLE,
-              },
-              {
-                address:
-                  'SysvarRecentB1ockHashes11111111111111111111' as Address,
-                role: AccountRole.READONLY,
-              },
-              {
-                address:
-                  'HzMoc78z1VNNf9nwD4Czt6CDYEb9LVD8KsVGP46FEmyJ' as Address,
-                role: AccountRole.READONLY_SIGNER,
-              },
-            ],
-            data: new Uint8Array([4, 0, 0, 0]),
-            programAddress: '11111111111111111111111111111111' as Address,
-          },
-        ],
-        lifetimeConstraint: {
-          nonce: 'BzAqD6382v5r1pcELoi8HWrBDV4dSL9NGemMn2JYAhxc' as Nonce,
+    const transactionMessage = {
+      ...mockTransactionMessage,
+      instructions: [
+        {
+          accounts: [
+            {
+              address:
+                '7wJFRFuAE9x5Ptnz2VoBWsfecTCfuuM2sQCpECGypnTU' as Address,
+              role: AccountRole.WRITABLE,
+            },
+            {
+              address: 'SysvarRecentB1ockHashes11111111111111111111' as Address,
+              role: AccountRole.READONLY,
+            },
+            {
+              address:
+                'HzMoc78z1VNNf9nwD4Czt6CDYEb9LVD8KsVGP46FEmyJ' as Address,
+              role: AccountRole.READONLY_SIGNER,
+            },
+          ],
+          data: new Uint8Array([4, 0, 0, 0]),
+          programAddress: '11111111111111111111111111111111' as Address,
         },
+      ],
+      lifetimeConstraint: {
+        nonce: 'BzAqD6382v5r1pcELoi8HWrBDV4dSL9NGemMn2JYAhxc' as Nonce,
       },
-    }).catch(() => {});
+    };
+    estimateComputeUnitLimit({ rpc, transactionMessage }).catch(() => {});
 
     expect(simulateTransaction).toHaveBeenCalledWith(
       expect.anything(),
@@ -194,13 +193,11 @@ describe('estimateComputeUnitLimit', () => {
   });
 
   it('asks for a replacement blockhash even when the transaction message has a blockhash lifetime', () => {
-    estimateComputeUnitLimit({
-      rpc,
-      transactionMessage: {
-        ...mockTransactionMessage,
-        lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
-      },
-    }).catch(() => {});
+    const transactionMessage = {
+      ...mockTransactionMessage,
+      lifetimeConstraint: MOCK_BLOCKHASH_LIFETIME_CONSTRAINT,
+    };
+    estimateComputeUnitLimit({ rpc, transactionMessage }).catch(() => {});
 
     expect(simulateTransaction).toHaveBeenCalledWith(
       expect.anything(),
