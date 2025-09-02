@@ -14,7 +14,9 @@ test('it sets the compute unit limit of a transaction', async () => {
   const payer = await generateKeyPairSignerWithSol(client);
 
   // When we create a transaction with a compute unit limit of 600,000.
-  const setComputeUnit = getSetComputeUnitLimitInstruction({ units: 600_000 });
+  const setComputeUnit = getSetComputeUnitLimitInstruction({
+    units: 600_000,
+  });
   const promise = pipe(
     await createDefaultTransaction(client, payer),
     (tx) => appendTransactionMessageInstruction(setComputeUnit, tx),

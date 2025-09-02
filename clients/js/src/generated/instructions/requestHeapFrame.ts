@@ -15,14 +15,15 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type AccountMeta,
   type Address,
-  type Codec,
-  type Decoder,
-  type Encoder,
-  type IAccountMeta,
-  type IInstruction,
-  type IInstructionWithAccounts,
-  type IInstructionWithData,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
@@ -34,10 +35,10 @@ export function getRequestHeapFrameDiscriminatorBytes() {
 
 export type RequestHeapFrameInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> &
+  InstructionWithData<ReadonlyUint8Array> &
+  InstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestHeapFrameInstructionData = {
   discriminator: number;
@@ -56,7 +57,7 @@ export type RequestHeapFrameInstructionDataArgs = {
   bytes: number;
 };
 
-export function getRequestHeapFrameInstructionDataEncoder(): Encoder<RequestHeapFrameInstructionDataArgs> {
+export function getRequestHeapFrameInstructionDataEncoder(): FixedSizeEncoder<RequestHeapFrameInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ['discriminator', getU8Encoder()],
@@ -66,14 +67,14 @@ export function getRequestHeapFrameInstructionDataEncoder(): Encoder<RequestHeap
   );
 }
 
-export function getRequestHeapFrameInstructionDataDecoder(): Decoder<RequestHeapFrameInstructionData> {
+export function getRequestHeapFrameInstructionDataDecoder(): FixedSizeDecoder<RequestHeapFrameInstructionData> {
   return getStructDecoder([
     ['discriminator', getU8Decoder()],
     ['bytes', getU32Decoder()],
   ]);
 }
 
-export function getRequestHeapFrameInstructionDataCodec(): Codec<
+export function getRequestHeapFrameInstructionDataCodec(): FixedSizeCodec<
   RequestHeapFrameInstructionDataArgs,
   RequestHeapFrameInstructionData
 > {
@@ -118,7 +119,7 @@ export type ParsedRequestHeapFrameInstruction<
 };
 
 export function parseRequestHeapFrameInstruction<TProgram extends string>(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
 ): ParsedRequestHeapFrameInstruction<TProgram> {
   return {
     programAddress: instruction.programAddress,

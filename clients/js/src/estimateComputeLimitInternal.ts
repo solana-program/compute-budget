@@ -1,11 +1,10 @@
 import {
+  BaseTransactionMessage,
   Commitment,
-  CompilableTransactionMessage,
   compileTransaction,
   getBase64EncodedWireTransaction,
-  isDurableNonceTransaction,
   isSolanaError,
-  ITransactionMessageWithFeePayer,
+  isTransactionMessageWithDurableNonceLifetime,
   pipe,
   Rpc,
   SimulateTransactionApi,
@@ -14,11 +13,10 @@ import {
   SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
   SolanaError,
   Transaction,
-  TransactionMessage,
+  TransactionMessageWithFeePayer,
 } from '@solana/kit';
 import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 import { MAX_COMPUTE_UNIT_LIMIT } from './constants';
-import { fillMissingTransactionMessageLifetimeUsingProvisoryBlockhash } from './internalMoveToKit';
 
 export type EstimateComputeUnitLimitFactoryConfig = Readonly<{
   /** An object that supports the {@link SimulateTransactionApi} of the Solana RPC API */
@@ -26,9 +24,7 @@ export type EstimateComputeUnitLimitFactoryConfig = Readonly<{
 }>;
 
 export type EstimateComputeUnitLimitFactoryFunction = (
-  transactionMessage:
-    | CompilableTransactionMessage
-    | (TransactionMessage & ITransactionMessageWithFeePayer),
+  transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer,
   config?: EstimateComputeUnitLimitFactoryFunctionConfig
 ) => Promise<number>;
 
@@ -54,9 +50,8 @@ type EstimateComputeUnitLimitConfig =
   EstimateComputeUnitLimitFactoryFunctionConfig &
     Readonly<{
       rpc: Rpc<SimulateTransactionApi>;
-      transactionMessage:
-        | CompilableTransactionMessage
-        | (TransactionMessage & ITransactionMessageWithFeePayer);
+      transactionMessage: BaseTransactionMessage &
+        TransactionMessageWithFeePayer;
     }>;
 
 /**
@@ -120,10 +115,10 @@ export async function estimateComputeUnitLimit({
   transactionMessage,
   ...configs
 }: EstimateComputeUnitLimitConfig): Promise<number> {
-  const replaceRecentBlockhash = !isDurableNonceTransaction(transactionMessage);
+  const replaceRecentBlockhash =
+    !isTransactionMessageWithDurableNonceLifetime(transactionMessage);
   const transaction = pipe(
     transactionMessage,
-    fillMissingTransactionMessageLifetimeUsingProvisoryBlockhash,
     (m) =>
       updateOrAppendSetComputeUnitLimitInstruction(MAX_COMPUTE_UNIT_LIMIT, m),
     compileTransaction

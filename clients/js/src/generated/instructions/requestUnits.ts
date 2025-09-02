@@ -15,14 +15,15 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type AccountMeta,
   type Address,
-  type Codec,
-  type Decoder,
-  type Encoder,
-  type IAccountMeta,
-  type IInstruction,
-  type IInstructionWithAccounts,
-  type IInstructionWithData,
+  type FixedSizeCodec,
+  type FixedSizeDecoder,
+  type FixedSizeEncoder,
+  type Instruction,
+  type InstructionWithAccounts,
+  type InstructionWithData,
+  type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
@@ -34,10 +35,10 @@ export function getRequestUnitsDiscriminatorBytes() {
 
 export type RequestUnitsInstruction<
   TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<TRemainingAccounts>;
+  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> &
+  InstructionWithData<ReadonlyUint8Array> &
+  InstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestUnitsInstructionData = {
   discriminator: number;
@@ -54,7 +55,7 @@ export type RequestUnitsInstructionDataArgs = {
   additionalFee: number;
 };
 
-export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsInstructionDataArgs> {
+export function getRequestUnitsInstructionDataEncoder(): FixedSizeEncoder<RequestUnitsInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ['discriminator', getU8Encoder()],
@@ -65,7 +66,7 @@ export function getRequestUnitsInstructionDataEncoder(): Encoder<RequestUnitsIns
   );
 }
 
-export function getRequestUnitsInstructionDataDecoder(): Decoder<RequestUnitsInstructionData> {
+export function getRequestUnitsInstructionDataDecoder(): FixedSizeDecoder<RequestUnitsInstructionData> {
   return getStructDecoder([
     ['discriminator', getU8Decoder()],
     ['units', getU32Decoder()],
@@ -73,7 +74,7 @@ export function getRequestUnitsInstructionDataDecoder(): Decoder<RequestUnitsIns
   ]);
 }
 
-export function getRequestUnitsInstructionDataCodec(): Codec<
+export function getRequestUnitsInstructionDataCodec(): FixedSizeCodec<
   RequestUnitsInstructionDataArgs,
   RequestUnitsInstructionData
 > {
@@ -119,7 +120,7 @@ export type ParsedRequestUnitsInstruction<
 };
 
 export function parseRequestUnitsInstruction<TProgram extends string>(
-  instruction: IInstruction<TProgram> & IInstructionWithData<Uint8Array>
+  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
 ): ParsedRequestUnitsInstruction<TProgram> {
   return {
     programAddress: instruction.programAddress,
