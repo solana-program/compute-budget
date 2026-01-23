@@ -10,6 +10,7 @@ import {
     SOLANA_ERROR__INSTRUCTION_ERROR__INSUFFICIENT_FUNDS,
     SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT,
     SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
+    SOLANA_ERROR__TRANSACTION_ERROR__ACCOUNT_NOT_FOUND,
     SolanaError,
     TransactionError,
     TransactionMessageWithFeePayer,
@@ -235,7 +236,7 @@ describe('estimateComputeUnitLimit', () => {
         await expect(estimatePromise).resolves.toBe(1400000);
     });
 
-    it('throws with the transaction error as cause when the transaction fails in simulation', async () => {
+    it('throws with the transaction SolanaError as cause when the transaction fails in simulation', async () => {
         expect.assertions(1);
         const transactionError: TransactionError = 'AccountNotFound';
         sendSimulateTransactionRequest.mockResolvedValue({
@@ -249,7 +250,7 @@ describe('estimateComputeUnitLimit', () => {
 
         await expect(estimatePromise).rejects.toThrow(
             new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
-                cause: transactionError,
+                cause: new SolanaError(SOLANA_ERROR__TRANSACTION_ERROR__ACCOUNT_NOT_FOUND),
                 unitsConsumed: 42,
             }),
         );
