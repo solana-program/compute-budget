@@ -7,119 +7,104 @@
  */
 
 import {
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU8Decoder,
-  getU8Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
+    combineCodec,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    getU8Decoder,
+    getU8Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR = 2;
 
 export function getSetComputeUnitLimitDiscriminatorBytes() {
-  return getU8Encoder().encode(SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR);
+    return getU8Encoder().encode(SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR);
 }
 
 export type SetComputeUnitLimitInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
-> = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<TRemainingAccounts>;
+    TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array> & InstructionWithAccounts<TRemainingAccounts>;
 
 export type SetComputeUnitLimitInstructionData = {
-  discriminator: number;
-  /** Transaction-wide compute unit limit. */
-  units: number;
+    discriminator: number;
+    /** Transaction-wide compute unit limit. */
+    units: number;
 };
 
 export type SetComputeUnitLimitInstructionDataArgs = {
-  /** Transaction-wide compute unit limit. */
-  units: number;
+    /** Transaction-wide compute unit limit. */
+    units: number;
 };
 
 export function getSetComputeUnitLimitInstructionDataEncoder(): FixedSizeEncoder<SetComputeUnitLimitInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU8Encoder()],
-      ['units', getU32Encoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR,
-    })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU8Encoder()],
+            ['units', getU32Encoder()],
+        ]),
+        value => ({ ...value, discriminator: SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR }),
+    );
 }
 
 export function getSetComputeUnitLimitInstructionDataDecoder(): FixedSizeDecoder<SetComputeUnitLimitInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU8Decoder()],
-    ['units', getU32Decoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU8Decoder()],
+        ['units', getU32Decoder()],
+    ]);
 }
 
 export function getSetComputeUnitLimitInstructionDataCodec(): FixedSizeCodec<
-  SetComputeUnitLimitInstructionDataArgs,
-  SetComputeUnitLimitInstructionData
+    SetComputeUnitLimitInstructionDataArgs,
+    SetComputeUnitLimitInstructionData
 > {
-  return combineCodec(
-    getSetComputeUnitLimitInstructionDataEncoder(),
-    getSetComputeUnitLimitInstructionDataDecoder()
-  );
+    return combineCodec(getSetComputeUnitLimitInstructionDataEncoder(), getSetComputeUnitLimitInstructionDataDecoder());
 }
 
 export type SetComputeUnitLimitInput = {
-  units: SetComputeUnitLimitInstructionDataArgs['units'];
+    units: SetComputeUnitLimitInstructionDataArgs['units'];
 };
 
 export function getSetComputeUnitLimitInstruction<
-  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 >(
-  input: SetComputeUnitLimitInput,
-  config?: { programAddress?: TProgramAddress }
+    input: SetComputeUnitLimitInput,
+    config?: { programAddress?: TProgramAddress },
 ): SetComputeUnitLimitInstruction<TProgramAddress> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    // Program address.
+    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  return Object.freeze({
-    data: getSetComputeUnitLimitInstructionDataEncoder().encode(
-      args as SetComputeUnitLimitInstructionDataArgs
-    ),
-    programAddress,
-  } as SetComputeUnitLimitInstruction<TProgramAddress>);
+    return Object.freeze({
+        data: getSetComputeUnitLimitInstructionDataEncoder().encode(args as SetComputeUnitLimitInstructionDataArgs),
+        programAddress,
+    } as SetComputeUnitLimitInstruction<TProgramAddress>);
 }
 
-export type ParsedSetComputeUnitLimitInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-> = {
-  programAddress: Address<TProgram>;
-  data: SetComputeUnitLimitInstructionData;
+export type ParsedSetComputeUnitLimitInstruction<TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> = {
+    programAddress: Address<TProgram>;
+    data: SetComputeUnitLimitInstructionData;
 };
 
 export function parseSetComputeUnitLimitInstruction<TProgram extends string>(
-  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetComputeUnitLimitInstruction<TProgram> {
-  return {
-    programAddress: instruction.programAddress,
-    data: getSetComputeUnitLimitInstructionDataDecoder().decode(
-      instruction.data
-    ),
-  };
+    return {
+        programAddress: instruction.programAddress,
+        data: getSetComputeUnitLimitInstructionDataDecoder().decode(instruction.data),
+    };
 }

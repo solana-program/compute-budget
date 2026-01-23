@@ -6,70 +6,57 @@
  * @see https://github.com/codama-idl/codama
  */
 
+import { containsBytes, getU8Encoder, type Address, type ReadonlyUint8Array } from '@solana/kit';
 import {
-  containsBytes,
-  getU8Encoder,
-  type Address,
-  type ReadonlyUint8Array,
-} from '@solana/kit';
-import {
-  type ParsedRequestHeapFrameInstruction,
-  type ParsedRequestUnitsInstruction,
-  type ParsedSetComputeUnitLimitInstruction,
-  type ParsedSetComputeUnitPriceInstruction,
-  type ParsedSetLoadedAccountsDataSizeLimitInstruction,
+    type ParsedRequestHeapFrameInstruction,
+    type ParsedRequestUnitsInstruction,
+    type ParsedSetComputeUnitLimitInstruction,
+    type ParsedSetComputeUnitPriceInstruction,
+    type ParsedSetLoadedAccountsDataSizeLimitInstruction,
 } from '../instructions';
 
 export const COMPUTE_BUDGET_PROGRAM_ADDRESS =
-  'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
+    'ComputeBudget111111111111111111111111111111' as Address<'ComputeBudget111111111111111111111111111111'>;
 
 export enum ComputeBudgetInstruction {
-  RequestUnits,
-  RequestHeapFrame,
-  SetComputeUnitLimit,
-  SetComputeUnitPrice,
-  SetLoadedAccountsDataSizeLimit,
+    RequestUnits,
+    RequestHeapFrame,
+    SetComputeUnitLimit,
+    SetComputeUnitPrice,
+    SetLoadedAccountsDataSizeLimit,
 }
 
 export function identifyComputeBudgetInstruction(
-  instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+    instruction: { data: ReadonlyUint8Array } | ReadonlyUint8Array,
 ): ComputeBudgetInstruction {
-  const data = 'data' in instruction ? instruction.data : instruction;
-  if (containsBytes(data, getU8Encoder().encode(0), 0)) {
-    return ComputeBudgetInstruction.RequestUnits;
-  }
-  if (containsBytes(data, getU8Encoder().encode(1), 0)) {
-    return ComputeBudgetInstruction.RequestHeapFrame;
-  }
-  if (containsBytes(data, getU8Encoder().encode(2), 0)) {
-    return ComputeBudgetInstruction.SetComputeUnitLimit;
-  }
-  if (containsBytes(data, getU8Encoder().encode(3), 0)) {
-    return ComputeBudgetInstruction.SetComputeUnitPrice;
-  }
-  if (containsBytes(data, getU8Encoder().encode(4), 0)) {
-    return ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
-  }
-  throw new Error(
-    'The provided instruction could not be identified as a computeBudget instruction.'
-  );
+    const data = 'data' in instruction ? instruction.data : instruction;
+    if (containsBytes(data, getU8Encoder().encode(0), 0)) {
+        return ComputeBudgetInstruction.RequestUnits;
+    }
+    if (containsBytes(data, getU8Encoder().encode(1), 0)) {
+        return ComputeBudgetInstruction.RequestHeapFrame;
+    }
+    if (containsBytes(data, getU8Encoder().encode(2), 0)) {
+        return ComputeBudgetInstruction.SetComputeUnitLimit;
+    }
+    if (containsBytes(data, getU8Encoder().encode(3), 0)) {
+        return ComputeBudgetInstruction.SetComputeUnitPrice;
+    }
+    if (containsBytes(data, getU8Encoder().encode(4), 0)) {
+        return ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
+    }
+    throw new Error('The provided instruction could not be identified as a computeBudget instruction.');
 }
 
-export type ParsedComputeBudgetInstruction<
-  TProgram extends string = 'ComputeBudget111111111111111111111111111111',
-> =
-  | ({
-      instructionType: ComputeBudgetInstruction.RequestUnits;
-    } & ParsedRequestUnitsInstruction<TProgram>)
-  | ({
-      instructionType: ComputeBudgetInstruction.RequestHeapFrame;
-    } & ParsedRequestHeapFrameInstruction<TProgram>)
-  | ({
-      instructionType: ComputeBudgetInstruction.SetComputeUnitLimit;
-    } & ParsedSetComputeUnitLimitInstruction<TProgram>)
-  | ({
-      instructionType: ComputeBudgetInstruction.SetComputeUnitPrice;
-    } & ParsedSetComputeUnitPriceInstruction<TProgram>)
-  | ({
-      instructionType: ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
-    } & ParsedSetLoadedAccountsDataSizeLimitInstruction<TProgram>);
+export type ParsedComputeBudgetInstruction<TProgram extends string = 'ComputeBudget111111111111111111111111111111'> =
+    | ({ instructionType: ComputeBudgetInstruction.RequestUnits } & ParsedRequestUnitsInstruction<TProgram>)
+    | ({ instructionType: ComputeBudgetInstruction.RequestHeapFrame } & ParsedRequestHeapFrameInstruction<TProgram>)
+    | ({
+          instructionType: ComputeBudgetInstruction.SetComputeUnitLimit;
+      } & ParsedSetComputeUnitLimitInstruction<TProgram>)
+    | ({
+          instructionType: ComputeBudgetInstruction.SetComputeUnitPrice;
+      } & ParsedSetComputeUnitPriceInstruction<TProgram>)
+    | ({
+          instructionType: ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
+      } & ParsedSetLoadedAccountsDataSizeLimitInstruction<TProgram>);

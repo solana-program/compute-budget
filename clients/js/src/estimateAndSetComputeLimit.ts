@@ -1,24 +1,17 @@
+import { BaseTransactionMessage, TransactionMessageWithFeePayer } from '@solana/kit';
+import { MAX_COMPUTE_UNIT_LIMIT, PROVISORY_COMPUTE_UNIT_LIMIT } from './constants';
 import {
-  BaseTransactionMessage,
-  TransactionMessageWithFeePayer,
-} from '@solana/kit';
-import {
-  MAX_COMPUTE_UNIT_LIMIT,
-  PROVISORY_COMPUTE_UNIT_LIMIT,
-} from './constants';
-import {
-  EstimateComputeUnitLimitFactoryFunction,
-  EstimateComputeUnitLimitFactoryFunctionConfig,
+    EstimateComputeUnitLimitFactoryFunction,
+    EstimateComputeUnitLimitFactoryFunctionConfig,
 } from './estimateComputeLimitInternal';
 import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
 import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 
 type EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction = <
-  TTransactionMessage extends BaseTransactionMessage &
-    TransactionMessageWithFeePayer,
+    TTransactionMessage extends BaseTransactionMessage & TransactionMessageWithFeePayer,
 >(
-  transactionMessage: TTransactionMessage,
-  config?: EstimateComputeUnitLimitFactoryFunctionConfig
+    transactionMessage: TTransactionMessage,
+    config?: EstimateComputeUnitLimitFactoryFunctionConfig,
 ) => Promise<TTransactionMessage>;
 
 /**
@@ -40,26 +33,25 @@ type EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction = <
  * @see {@link estimateAndUpdateProvisoryComputeUnitLimitFactory}
  */
 export function estimateAndUpdateProvisoryComputeUnitLimitFactory(
-  estimateComputeUnitLimit: EstimateComputeUnitLimitFactoryFunction
+    estimateComputeUnitLimit: EstimateComputeUnitLimitFactoryFunction,
 ): EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction {
-  return async function fn(transactionMessage, config) {
-    const instructionDetails =
-      getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
+    return async function fn(transactionMessage, config) {
+        const instructionDetails = getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
 
-    // If the transaction message already has a compute unit limit instruction
-    // which is set to a specific value — i.e. not 0 or the maximum limit —
-    // we don't need to estimate the compute unit limit.
-    if (
-      instructionDetails &&
-      instructionDetails.units !== PROVISORY_COMPUTE_UNIT_LIMIT &&
-      instructionDetails.units !== MAX_COMPUTE_UNIT_LIMIT
-    ) {
-      return transactionMessage;
-    }
+        // If the transaction message already has a compute unit limit instruction
+        // which is set to a specific value — i.e. not 0 or the maximum limit —
+        // we don't need to estimate the compute unit limit.
+        if (
+            instructionDetails &&
+            instructionDetails.units !== PROVISORY_COMPUTE_UNIT_LIMIT &&
+            instructionDetails.units !== MAX_COMPUTE_UNIT_LIMIT
+        ) {
+            return transactionMessage;
+        }
 
-    return updateOrAppendSetComputeUnitLimitInstruction(
-      await estimateComputeUnitLimit(transactionMessage, config),
-      transactionMessage
-    );
-  };
+        return updateOrAppendSetComputeUnitLimitInstruction(
+            await estimateComputeUnitLimit(transactionMessage, config),
+            transactionMessage,
+        );
+    };
 }

@@ -1,7 +1,4 @@
-import {
-  appendTransactionMessageInstruction,
-  BaseTransactionMessage,
-} from '@solana/kit';
+import { appendTransactionMessageInstruction, BaseTransactionMessage } from '@solana/kit';
 import { PROVISORY_COMPUTE_UNIT_LIMIT } from './constants';
 import { getSetComputeUnitLimitInstruction } from './generated';
 import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
@@ -20,14 +17,13 @@ import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
  * );
  * ```
  */
-export function fillProvisorySetComputeUnitLimitInstruction<
-  TTransactionMessage extends BaseTransactionMessage,
->(transactionMessage: TTransactionMessage) {
-  return updateOrAppendSetComputeUnitLimitInstruction(
-    (previousUnits) =>
-      previousUnits === null ? PROVISORY_COMPUTE_UNIT_LIMIT : previousUnits,
-    transactionMessage
-  );
+export function fillProvisorySetComputeUnitLimitInstruction<TTransactionMessage extends BaseTransactionMessage>(
+    transactionMessage: TTransactionMessage,
+) {
+    return updateOrAppendSetComputeUnitLimitInstruction(
+        previousUnits => (previousUnits === null ? PROVISORY_COMPUTE_UNIT_LIMIT : previousUnits),
+        transactionMessage,
+    );
 }
 
 /**
@@ -48,35 +44,32 @@ export function fillProvisorySetComputeUnitLimitInstruction<
  * );
  * ```
  */
-export function updateOrAppendSetComputeUnitLimitInstruction<
-  TTransactionMessage extends BaseTransactionMessage,
->(
-  units: number | ((previousUnits: number | null) => number),
-  transactionMessage: TTransactionMessage
+export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage extends BaseTransactionMessage>(
+    units: number | ((previousUnits: number | null) => number),
+    transactionMessage: TTransactionMessage,
 ): TTransactionMessage {
-  const getUnits = (previousUnits: number | null): number =>
-    typeof units === 'function' ? units(previousUnits) : units;
-  const instructionDetails =
-    getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
+    const getUnits = (previousUnits: number | null): number =>
+        typeof units === 'function' ? units(previousUnits) : units;
+    const instructionDetails = getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
 
-  if (!instructionDetails) {
-    return appendTransactionMessageInstruction(
-      getSetComputeUnitLimitInstruction({ units: getUnits(null) }),
-      transactionMessage
-    ) as unknown as TTransactionMessage;
-  }
+    if (!instructionDetails) {
+        return appendTransactionMessageInstruction(
+            getSetComputeUnitLimitInstruction({ units: getUnits(null) }),
+            transactionMessage,
+        ) as unknown as TTransactionMessage;
+    }
 
-  const { index, units: previousUnits } = instructionDetails;
-  const newUnits = getUnits(previousUnits);
-  if (newUnits === previousUnits) {
-    return transactionMessage;
-  }
+    const { index, units: previousUnits } = instructionDetails;
+    const newUnits = getUnits(previousUnits);
+    if (newUnits === previousUnits) {
+        return transactionMessage;
+    }
 
-  const newInstruction = getSetComputeUnitLimitInstruction({ units: newUnits });
-  const newInstructions = [...transactionMessage.instructions];
-  newInstructions.splice(index, 1, newInstruction);
-  return Object.freeze({
-    ...transactionMessage,
-    instructions: newInstructions,
-  });
+    const newInstruction = getSetComputeUnitLimitInstruction({ units: newUnits });
+    const newInstructions = [...transactionMessage.instructions];
+    newInstructions.splice(index, 1, newInstruction);
+    return Object.freeze({
+        ...transactionMessage,
+        instructions: newInstructions,
+    });
 }

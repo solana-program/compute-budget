@@ -1,57 +1,55 @@
 import {
-  BaseTransactionMessage,
-  Commitment,
-  compileTransaction,
-  getBase64EncodedWireTransaction,
-  isSolanaError,
-  isTransactionMessageWithDurableNonceLifetime,
-  pipe,
-  Rpc,
-  SimulateTransactionApi,
-  Slot,
-  SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT,
-  SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
-  SolanaError,
-  Transaction,
-  TransactionMessageWithFeePayer,
+    BaseTransactionMessage,
+    Commitment,
+    compileTransaction,
+    getBase64EncodedWireTransaction,
+    isSolanaError,
+    isTransactionMessageWithDurableNonceLifetime,
+    pipe,
+    Rpc,
+    SimulateTransactionApi,
+    Slot,
+    SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT,
+    SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
+    SolanaError,
+    Transaction,
+    TransactionMessageWithFeePayer,
 } from '@solana/kit';
 import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 import { MAX_COMPUTE_UNIT_LIMIT } from './constants';
 
 export type EstimateComputeUnitLimitFactoryConfig = Readonly<{
-  /** An object that supports the {@link SimulateTransactionApi} of the Solana RPC API */
-  rpc: Rpc<SimulateTransactionApi>;
+    /** An object that supports the {@link SimulateTransactionApi} of the Solana RPC API */
+    rpc: Rpc<SimulateTransactionApi>;
 }>;
 
 export type EstimateComputeUnitLimitFactoryFunction = (
-  transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer,
-  config?: EstimateComputeUnitLimitFactoryFunctionConfig
+    transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer,
+    config?: EstimateComputeUnitLimitFactoryFunctionConfig,
 ) => Promise<number>;
 
 export type EstimateComputeUnitLimitFactoryFunctionConfig = {
-  abortSignal?: AbortSignal;
-  /**
-   * Compute the estimate as of the highest slot that has reached this level of commitment.
-   *
-   * @defaultValue Whichever default is applied by the underlying {@link RpcApi} in use. For
-   * example, when using an API created by a `createSolanaRpc*()` helper, the default commitment
-   * is `"confirmed"` unless configured otherwise. Unmitigated by an API layer on the client, the
-   * default commitment applied by the server is `"finalized"`.
-   */
-  commitment?: Commitment;
-  /**
-   * Prevents accessing stale data by enforcing that the RPC node has processed transactions up to
-   * this slot
-   */
-  minContextSlot?: Slot;
+    abortSignal?: AbortSignal;
+    /**
+     * Compute the estimate as of the highest slot that has reached this level of commitment.
+     *
+     * @defaultValue Whichever default is applied by the underlying {@link RpcApi} in use. For
+     * example, when using an API created by a `createSolanaRpc*()` helper, the default commitment
+     * is `"confirmed"` unless configured otherwise. Unmitigated by an API layer on the client, the
+     * default commitment applied by the server is `"finalized"`.
+     */
+    commitment?: Commitment;
+    /**
+     * Prevents accessing stale data by enforcing that the RPC node has processed transactions up to
+     * this slot
+     */
+    minContextSlot?: Slot;
 };
 
-type EstimateComputeUnitLimitConfig =
-  EstimateComputeUnitLimitFactoryFunctionConfig &
+type EstimateComputeUnitLimitConfig = EstimateComputeUnitLimitFactoryFunctionConfig &
     Readonly<{
-      rpc: Rpc<SimulateTransactionApi>;
-      transactionMessage: BaseTransactionMessage &
-        TransactionMessageWithFeePayer;
+        rpc: Rpc<SimulateTransactionApi>;
+        transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer;
     }>;
 
 /**
@@ -112,81 +110,61 @@ type EstimateComputeUnitLimitConfig =
  * > compute unit budget.
  */
 export async function estimateComputeUnitLimit({
-  transactionMessage,
-  ...configs
-}: EstimateComputeUnitLimitConfig): Promise<number> {
-  const replaceRecentBlockhash =
-    !isTransactionMessageWithDurableNonceLifetime(transactionMessage);
-  const transaction = pipe(
     transactionMessage,
-    (m) =>
-      updateOrAppendSetComputeUnitLimitInstruction(MAX_COMPUTE_UNIT_LIMIT, m),
-    compileTransaction
-  );
+    ...configs
+}: EstimateComputeUnitLimitConfig): Promise<number> {
+    const replaceRecentBlockhash = !isTransactionMessageWithDurableNonceLifetime(transactionMessage);
+    const transaction = pipe(
+        transactionMessage,
+        m => updateOrAppendSetComputeUnitLimitInstruction(MAX_COMPUTE_UNIT_LIMIT, m),
+        compileTransaction,
+    );
 
-  return await simulateTransactionAndGetConsumedUnits({
-    transaction,
-    replaceRecentBlockhash,
-    ...configs,
-  });
+    return await simulateTransactionAndGetConsumedUnits({
+        transaction,
+        replaceRecentBlockhash,
+        ...configs,
+    });
 }
 
-type SimulateTransactionAndGetConsumedUnitsConfig = Omit<
-  EstimateComputeUnitLimitConfig,
-  'transactionMessage'
-> &
-  Readonly<{ replaceRecentBlockhash?: boolean; transaction: Transaction }>;
+type SimulateTransactionAndGetConsumedUnitsConfig = Omit<EstimateComputeUnitLimitConfig, 'transactionMessage'> &
+    Readonly<{ replaceRecentBlockhash?: boolean; transaction: Transaction }>;
 
 async function simulateTransactionAndGetConsumedUnits({
-  abortSignal,
-  rpc,
-  transaction,
-  ...simulateConfig
+    abortSignal,
+    rpc,
+    transaction,
+    ...simulateConfig
 }: SimulateTransactionAndGetConsumedUnitsConfig): Promise<number> {
-  const wireTransactionBytes = getBase64EncodedWireTransaction(transaction);
+    const wireTransactionBytes = getBase64EncodedWireTransaction(transaction);
 
-  try {
-    const {
-      value: { err: transactionError, unitsConsumed },
-    } = await rpc
-      .simulateTransaction(wireTransactionBytes, {
-        ...simulateConfig,
-        encoding: 'base64',
-        sigVerify: false,
-      })
-      .send({ abortSignal });
-    if (unitsConsumed == null) {
-      // This should never be hit, because all RPCs should support `unitsConsumed` by now.
-      throw new SolanaError(
-        SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT
-      );
-    }
-    // FIXME(https://github.com/anza-xyz/agave/issues/1295): The simulation response returns
-    // compute units as a u64, but the `SetComputeLimit` instruction only accepts a u32. Until
-    // this changes, downcast it.
-    const downcastUnitsConsumed =
-      unitsConsumed > 4_294_967_295n ? 4_294_967_295 : Number(unitsConsumed);
-    if (transactionError) {
-      throw new SolanaError(
-        SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT,
-        {
-          cause: transactionError,
-          unitsConsumed: downcastUnitsConsumed,
+    try {
+        const {
+            value: { err: transactionError, unitsConsumed },
+        } = await rpc
+            .simulateTransaction(wireTransactionBytes, {
+                ...simulateConfig,
+                encoding: 'base64',
+                sigVerify: false,
+            })
+            .send({ abortSignal });
+        if (unitsConsumed == null) {
+            // This should never be hit, because all RPCs should support `unitsConsumed` by now.
+            throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT);
         }
-      );
+        // FIXME(https://github.com/anza-xyz/agave/issues/1295): The simulation response returns
+        // compute units as a u64, but the `SetComputeLimit` instruction only accepts a u32. Until
+        // this changes, downcast it.
+        const downcastUnitsConsumed = unitsConsumed > 4_294_967_295n ? 4_294_967_295 : Number(unitsConsumed);
+        if (transactionError) {
+            throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
+                cause: transactionError,
+                unitsConsumed: downcastUnitsConsumed,
+            });
+        }
+        return downcastUnitsConsumed;
+    } catch (e) {
+        if (isSolanaError(e, SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT)) throw e;
+        throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT, { cause: e });
     }
-    return downcastUnitsConsumed;
-  } catch (e) {
-    if (
-      isSolanaError(
-        e,
-        SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT
-      )
-    )
-      throw e;
-    throw new SolanaError(
-      SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT,
-      { cause: e }
-    );
-  }
 }

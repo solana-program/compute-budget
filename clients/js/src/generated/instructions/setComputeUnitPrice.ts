@@ -7,119 +7,104 @@
  */
 
 import {
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
-  getU8Decoder,
-  getU8Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
+    combineCodec,
+    getStructDecoder,
+    getStructEncoder,
+    getU64Decoder,
+    getU64Encoder,
+    getU8Decoder,
+    getU8Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR = 3;
 
 export function getSetComputeUnitPriceDiscriminatorBytes() {
-  return getU8Encoder().encode(SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR);
+    return getU8Encoder().encode(SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR);
 }
 
 export type SetComputeUnitPriceInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
-> = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<TRemainingAccounts>;
+    TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array> & InstructionWithAccounts<TRemainingAccounts>;
 
 export type SetComputeUnitPriceInstructionData = {
-  discriminator: number;
-  /** Transaction compute unit price used for prioritization fees. */
-  microLamports: bigint;
+    discriminator: number;
+    /** Transaction compute unit price used for prioritization fees. */
+    microLamports: bigint;
 };
 
 export type SetComputeUnitPriceInstructionDataArgs = {
-  /** Transaction compute unit price used for prioritization fees. */
-  microLamports: number | bigint;
+    /** Transaction compute unit price used for prioritization fees. */
+    microLamports: number | bigint;
 };
 
 export function getSetComputeUnitPriceInstructionDataEncoder(): FixedSizeEncoder<SetComputeUnitPriceInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU8Encoder()],
-      ['microLamports', getU64Encoder()],
-    ]),
-    (value) => ({
-      ...value,
-      discriminator: SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR,
-    })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU8Encoder()],
+            ['microLamports', getU64Encoder()],
+        ]),
+        value => ({ ...value, discriminator: SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR }),
+    );
 }
 
 export function getSetComputeUnitPriceInstructionDataDecoder(): FixedSizeDecoder<SetComputeUnitPriceInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU8Decoder()],
-    ['microLamports', getU64Decoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU8Decoder()],
+        ['microLamports', getU64Decoder()],
+    ]);
 }
 
 export function getSetComputeUnitPriceInstructionDataCodec(): FixedSizeCodec<
-  SetComputeUnitPriceInstructionDataArgs,
-  SetComputeUnitPriceInstructionData
+    SetComputeUnitPriceInstructionDataArgs,
+    SetComputeUnitPriceInstructionData
 > {
-  return combineCodec(
-    getSetComputeUnitPriceInstructionDataEncoder(),
-    getSetComputeUnitPriceInstructionDataDecoder()
-  );
+    return combineCodec(getSetComputeUnitPriceInstructionDataEncoder(), getSetComputeUnitPriceInstructionDataDecoder());
 }
 
 export type SetComputeUnitPriceInput = {
-  microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
+    microLamports: SetComputeUnitPriceInstructionDataArgs['microLamports'];
 };
 
 export function getSetComputeUnitPriceInstruction<
-  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 >(
-  input: SetComputeUnitPriceInput,
-  config?: { programAddress?: TProgramAddress }
+    input: SetComputeUnitPriceInput,
+    config?: { programAddress?: TProgramAddress },
 ): SetComputeUnitPriceInstruction<TProgramAddress> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    // Program address.
+    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  return Object.freeze({
-    data: getSetComputeUnitPriceInstructionDataEncoder().encode(
-      args as SetComputeUnitPriceInstructionDataArgs
-    ),
-    programAddress,
-  } as SetComputeUnitPriceInstruction<TProgramAddress>);
+    return Object.freeze({
+        data: getSetComputeUnitPriceInstructionDataEncoder().encode(args as SetComputeUnitPriceInstructionDataArgs),
+        programAddress,
+    } as SetComputeUnitPriceInstruction<TProgramAddress>);
 }
 
-export type ParsedSetComputeUnitPriceInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-> = {
-  programAddress: Address<TProgram>;
-  data: SetComputeUnitPriceInstructionData;
+export type ParsedSetComputeUnitPriceInstruction<TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> = {
+    programAddress: Address<TProgram>;
+    data: SetComputeUnitPriceInstructionData;
 };
 
 export function parseSetComputeUnitPriceInstruction<TProgram extends string>(
-  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
 ): ParsedSetComputeUnitPriceInstruction<TProgram> {
-  return {
-    programAddress: instruction.programAddress,
-    data: getSetComputeUnitPriceInstructionDataDecoder().decode(
-      instruction.data
-    ),
-  };
+    return {
+        programAddress: instruction.programAddress,
+        data: getSetComputeUnitPriceInstructionDataDecoder().decode(instruction.data),
+    };
 }

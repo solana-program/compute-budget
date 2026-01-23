@@ -1,8 +1,4 @@
-import {
-  appendTransactionMessageInstruction,
-  BaseTransactionMessage,
-  MicroLamports,
-} from '@solana/kit';
+import { appendTransactionMessageInstruction, BaseTransactionMessage, MicroLamports } from '@solana/kit';
 import { getSetComputeUnitPriceInstruction } from './generated';
 import { getSetComputeUnitPriceInstructionIndexAndMicroLamports } from './internal';
 
@@ -18,13 +14,14 @@ import { getSetComputeUnitPriceInstructionIndexAndMicroLamports } from './intern
  * );
  * ```
  */
-export function setTransactionMessageComputeUnitPrice<
-  TTransactionMessage extends BaseTransactionMessage,
->(microLamports: number | bigint, transactionMessage: TTransactionMessage) {
-  return appendTransactionMessageInstruction(
-    getSetComputeUnitPriceInstruction({ microLamports }),
-    transactionMessage
-  );
+export function setTransactionMessageComputeUnitPrice<TTransactionMessage extends BaseTransactionMessage>(
+    microLamports: number | bigint,
+    transactionMessage: TTransactionMessage,
+) {
+    return appendTransactionMessageInstruction(
+        getSetComputeUnitPriceInstruction({ microLamports }),
+        transactionMessage,
+    );
 }
 
 /**
@@ -45,45 +42,36 @@ export function setTransactionMessageComputeUnitPrice<
  * );
  * ```
  */
-export function updateOrAppendSetComputeUnitPriceInstruction<
-  TTransactionMessage extends BaseTransactionMessage,
->(
-  microLamports:
-    | MicroLamports
-    | ((previousMicroLamports: MicroLamports | null) => MicroLamports),
-  transactionMessage: TTransactionMessage
+export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage extends BaseTransactionMessage>(
+    microLamports: MicroLamports | ((previousMicroLamports: MicroLamports | null) => MicroLamports),
+    transactionMessage: TTransactionMessage,
 ): TTransactionMessage {
-  const getMicroLamports = (
-    previousMicroLamports: MicroLamports | null
-  ): MicroLamports =>
-    typeof microLamports === 'function'
-      ? microLamports(previousMicroLamports)
-      : microLamports;
-  const instructionDetails =
-    getSetComputeUnitPriceInstructionIndexAndMicroLamports(transactionMessage);
+    const getMicroLamports = (previousMicroLamports: MicroLamports | null): MicroLamports =>
+        typeof microLamports === 'function' ? microLamports(previousMicroLamports) : microLamports;
+    const instructionDetails = getSetComputeUnitPriceInstructionIndexAndMicroLamports(transactionMessage);
 
-  if (!instructionDetails) {
-    return appendTransactionMessageInstruction(
-      getSetComputeUnitPriceInstruction({
-        microLamports: getMicroLamports(null),
-      }),
-      transactionMessage
-    ) as unknown as TTransactionMessage;
-  }
+    if (!instructionDetails) {
+        return appendTransactionMessageInstruction(
+            getSetComputeUnitPriceInstruction({
+                microLamports: getMicroLamports(null),
+            }),
+            transactionMessage,
+        ) as unknown as TTransactionMessage;
+    }
 
-  const { index, microLamports: previousMicroLamports } = instructionDetails;
-  const newMicroLamports = getMicroLamports(previousMicroLamports);
-  if (newMicroLamports === previousMicroLamports) {
-    return transactionMessage;
-  }
+    const { index, microLamports: previousMicroLamports } = instructionDetails;
+    const newMicroLamports = getMicroLamports(previousMicroLamports);
+    if (newMicroLamports === previousMicroLamports) {
+        return transactionMessage;
+    }
 
-  const newInstruction = getSetComputeUnitPriceInstruction({
-    microLamports: newMicroLamports,
-  });
-  const newInstructions = [...transactionMessage.instructions];
-  newInstructions.splice(index, 1, newInstruction);
-  return Object.freeze({
-    ...transactionMessage,
-    instructions: newInstructions,
-  });
+    const newInstruction = getSetComputeUnitPriceInstruction({
+        microLamports: newMicroLamports,
+    });
+    const newInstructions = [...transactionMessage.instructions];
+    newInstructions.splice(index, 1, newInstruction);
+    return Object.freeze({
+        ...transactionMessage,
+        instructions: newInstructions,
+    });
 }
