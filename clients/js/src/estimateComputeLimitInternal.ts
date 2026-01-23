@@ -3,6 +3,7 @@ import {
     Commitment,
     compileTransaction,
     getBase64EncodedWireTransaction,
+    getSolanaErrorFromTransactionError,
     isSolanaError,
     isTransactionMessageWithDurableNonceLifetime,
     pipe,
@@ -158,7 +159,7 @@ async function simulateTransactionAndGetConsumedUnits({
         const downcastUnitsConsumed = unitsConsumed > 4_294_967_295n ? 4_294_967_295 : Number(unitsConsumed);
         if (transactionError) {
             throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
-                cause: transactionError,
+                cause: getSolanaErrorFromTransactionError(transactionError),
                 unitsConsumed: downcastUnitsConsumed,
             });
         }
