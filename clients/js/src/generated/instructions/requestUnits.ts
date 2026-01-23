@@ -7,118 +7,109 @@
  */
 
 import {
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU8Decoder,
-  getU8Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
+    combineCodec,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    getU8Decoder,
+    getU8Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const REQUEST_UNITS_DISCRIMINATOR = 0;
 
 export function getRequestUnitsDiscriminatorBytes() {
-  return getU8Encoder().encode(REQUEST_UNITS_DISCRIMINATOR);
+    return getU8Encoder().encode(REQUEST_UNITS_DISCRIMINATOR);
 }
 
 export type RequestUnitsInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
-> = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<TRemainingAccounts>;
+    TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array> & InstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestUnitsInstructionData = {
-  discriminator: number;
-  /** Units to request for transaction-wide compute. */
-  units: number;
-  /** Prioritization fee lamports. */
-  additionalFee: number;
+    discriminator: number;
+    /** Units to request for transaction-wide compute. */
+    units: number;
+    /** Prioritization fee lamports. */
+    additionalFee: number;
 };
 
 export type RequestUnitsInstructionDataArgs = {
-  /** Units to request for transaction-wide compute. */
-  units: number;
-  /** Prioritization fee lamports. */
-  additionalFee: number;
+    /** Units to request for transaction-wide compute. */
+    units: number;
+    /** Prioritization fee lamports. */
+    additionalFee: number;
 };
 
 export function getRequestUnitsInstructionDataEncoder(): FixedSizeEncoder<RequestUnitsInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU8Encoder()],
-      ['units', getU32Encoder()],
-      ['additionalFee', getU32Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: REQUEST_UNITS_DISCRIMINATOR })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU8Encoder()],
+            ['units', getU32Encoder()],
+            ['additionalFee', getU32Encoder()],
+        ]),
+        value => ({ ...value, discriminator: REQUEST_UNITS_DISCRIMINATOR }),
+    );
 }
 
 export function getRequestUnitsInstructionDataDecoder(): FixedSizeDecoder<RequestUnitsInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU8Decoder()],
-    ['units', getU32Decoder()],
-    ['additionalFee', getU32Decoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU8Decoder()],
+        ['units', getU32Decoder()],
+        ['additionalFee', getU32Decoder()],
+    ]);
 }
 
 export function getRequestUnitsInstructionDataCodec(): FixedSizeCodec<
-  RequestUnitsInstructionDataArgs,
-  RequestUnitsInstructionData
+    RequestUnitsInstructionDataArgs,
+    RequestUnitsInstructionData
 > {
-  return combineCodec(
-    getRequestUnitsInstructionDataEncoder(),
-    getRequestUnitsInstructionDataDecoder()
-  );
+    return combineCodec(getRequestUnitsInstructionDataEncoder(), getRequestUnitsInstructionDataDecoder());
 }
 
 export type RequestUnitsInput = {
-  units: RequestUnitsInstructionDataArgs['units'];
-  additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
+    units: RequestUnitsInstructionDataArgs['units'];
+    additionalFee: RequestUnitsInstructionDataArgs['additionalFee'];
 };
 
-export function getRequestUnitsInstruction<
-  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
->(
-  input: RequestUnitsInput,
-  config?: { programAddress?: TProgramAddress }
+export function getRequestUnitsInstruction<TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>(
+    input: RequestUnitsInput,
+    config?: { programAddress?: TProgramAddress },
 ): RequestUnitsInstruction<TProgramAddress> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    // Program address.
+    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  return Object.freeze({
-    data: getRequestUnitsInstructionDataEncoder().encode(
-      args as RequestUnitsInstructionDataArgs
-    ),
-    programAddress,
-  } as RequestUnitsInstruction<TProgramAddress>);
+    return Object.freeze({
+        data: getRequestUnitsInstructionDataEncoder().encode(args as RequestUnitsInstructionDataArgs),
+        programAddress,
+    } as RequestUnitsInstruction<TProgramAddress>);
 }
 
-export type ParsedRequestUnitsInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-> = { programAddress: Address<TProgram>; data: RequestUnitsInstructionData };
+export type ParsedRequestUnitsInstruction<TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> = {
+    programAddress: Address<TProgram>;
+    data: RequestUnitsInstructionData;
+};
 
 export function parseRequestUnitsInstruction<TProgram extends string>(
-  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRequestUnitsInstruction<TProgram> {
-  return {
-    programAddress: instruction.programAddress,
-    data: getRequestUnitsInstructionDataDecoder().decode(instruction.data),
-  };
+    return {
+        programAddress: instruction.programAddress,
+        data: getRequestUnitsInstructionDataDecoder().decode(instruction.data),
+    };
 }

@@ -7,120 +7,108 @@
  */
 
 import {
-  combineCodec,
-  getStructDecoder,
-  getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU8Decoder,
-  getU8Encoder,
-  transformEncoder,
-  type AccountMeta,
-  type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
-  type Instruction,
-  type InstructionWithAccounts,
-  type InstructionWithData,
-  type ReadonlyUint8Array,
+    combineCodec,
+    getStructDecoder,
+    getStructEncoder,
+    getU32Decoder,
+    getU32Encoder,
+    getU8Decoder,
+    getU8Encoder,
+    transformEncoder,
+    type AccountMeta,
+    type Address,
+    type FixedSizeCodec,
+    type FixedSizeDecoder,
+    type FixedSizeEncoder,
+    type Instruction,
+    type InstructionWithAccounts,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
 } from '@solana/kit';
 import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const REQUEST_HEAP_FRAME_DISCRIMINATOR = 1;
 
 export function getRequestHeapFrameDiscriminatorBytes() {
-  return getU8Encoder().encode(REQUEST_HEAP_FRAME_DISCRIMINATOR);
+    return getU8Encoder().encode(REQUEST_HEAP_FRAME_DISCRIMINATOR);
 }
 
 export type RequestHeapFrameInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-  TRemainingAccounts extends readonly AccountMeta<string>[] = [],
-> = Instruction<TProgram> &
-  InstructionWithData<ReadonlyUint8Array> &
-  InstructionWithAccounts<TRemainingAccounts>;
+    TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
+    TRemainingAccounts extends readonly AccountMeta<string>[] = [],
+> = Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array> & InstructionWithAccounts<TRemainingAccounts>;
 
 export type RequestHeapFrameInstructionData = {
-  discriminator: number;
-  /**
-   * Requested transaction-wide program heap size in bytes.
-   * Must be multiple of 1024. Applies to each program, including CPIs.
-   */
-  bytes: number;
+    discriminator: number;
+    /**
+     * Requested transaction-wide program heap size in bytes.
+     * Must be multiple of 1024. Applies to each program, including CPIs.
+     */
+    bytes: number;
 };
 
 export type RequestHeapFrameInstructionDataArgs = {
-  /**
-   * Requested transaction-wide program heap size in bytes.
-   * Must be multiple of 1024. Applies to each program, including CPIs.
-   */
-  bytes: number;
+    /**
+     * Requested transaction-wide program heap size in bytes.
+     * Must be multiple of 1024. Applies to each program, including CPIs.
+     */
+    bytes: number;
 };
 
 export function getRequestHeapFrameInstructionDataEncoder(): FixedSizeEncoder<RequestHeapFrameInstructionDataArgs> {
-  return transformEncoder(
-    getStructEncoder([
-      ['discriminator', getU8Encoder()],
-      ['bytes', getU32Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: REQUEST_HEAP_FRAME_DISCRIMINATOR })
-  );
+    return transformEncoder(
+        getStructEncoder([
+            ['discriminator', getU8Encoder()],
+            ['bytes', getU32Encoder()],
+        ]),
+        value => ({ ...value, discriminator: REQUEST_HEAP_FRAME_DISCRIMINATOR }),
+    );
 }
 
 export function getRequestHeapFrameInstructionDataDecoder(): FixedSizeDecoder<RequestHeapFrameInstructionData> {
-  return getStructDecoder([
-    ['discriminator', getU8Decoder()],
-    ['bytes', getU32Decoder()],
-  ]);
+    return getStructDecoder([
+        ['discriminator', getU8Decoder()],
+        ['bytes', getU32Decoder()],
+    ]);
 }
 
 export function getRequestHeapFrameInstructionDataCodec(): FixedSizeCodec<
-  RequestHeapFrameInstructionDataArgs,
-  RequestHeapFrameInstructionData
+    RequestHeapFrameInstructionDataArgs,
+    RequestHeapFrameInstructionData
 > {
-  return combineCodec(
-    getRequestHeapFrameInstructionDataEncoder(),
-    getRequestHeapFrameInstructionDataDecoder()
-  );
+    return combineCodec(getRequestHeapFrameInstructionDataEncoder(), getRequestHeapFrameInstructionDataDecoder());
 }
 
 export type RequestHeapFrameInput = {
-  bytes: RequestHeapFrameInstructionDataArgs['bytes'];
+    bytes: RequestHeapFrameInstructionDataArgs['bytes'];
 };
 
-export function getRequestHeapFrameInstruction<
-  TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
->(
-  input: RequestHeapFrameInput,
-  config?: { programAddress?: TProgramAddress }
+export function getRequestHeapFrameInstruction<TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>(
+    input: RequestHeapFrameInput,
+    config?: { programAddress?: TProgramAddress },
 ): RequestHeapFrameInstruction<TProgramAddress> {
-  // Program address.
-  const programAddress =
-    config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    // Program address.
+    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
 
-  // Original args.
-  const args = { ...input };
+    // Original args.
+    const args = { ...input };
 
-  return Object.freeze({
-    data: getRequestHeapFrameInstructionDataEncoder().encode(
-      args as RequestHeapFrameInstructionDataArgs
-    ),
-    programAddress,
-  } as RequestHeapFrameInstruction<TProgramAddress>);
+    return Object.freeze({
+        data: getRequestHeapFrameInstructionDataEncoder().encode(args as RequestHeapFrameInstructionDataArgs),
+        programAddress,
+    } as RequestHeapFrameInstruction<TProgramAddress>);
 }
 
-export type ParsedRequestHeapFrameInstruction<
-  TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
-> = {
-  programAddress: Address<TProgram>;
-  data: RequestHeapFrameInstructionData;
+export type ParsedRequestHeapFrameInstruction<TProgram extends string = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS> = {
+    programAddress: Address<TProgram>;
+    data: RequestHeapFrameInstructionData;
 };
 
 export function parseRequestHeapFrameInstruction<TProgram extends string>(
-  instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
 ): ParsedRequestHeapFrameInstruction<TProgram> {
-  return {
-    programAddress: instruction.programAddress,
-    data: getRequestHeapFrameInstructionDataDecoder().decode(instruction.data),
-  };
+    return {
+        programAddress: instruction.programAddress,
+        data: getRequestHeapFrameInstructionDataDecoder().decode(instruction.data),
+    };
 }

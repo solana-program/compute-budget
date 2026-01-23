@@ -1,7 +1,7 @@
 import {
-  estimateComputeUnitLimit,
-  EstimateComputeUnitLimitFactoryConfig,
-  EstimateComputeUnitLimitFactoryFunction,
+    estimateComputeUnitLimit,
+    EstimateComputeUnitLimitFactoryConfig,
+    EstimateComputeUnitLimitFactoryFunction,
 } from './estimateComputeLimitInternal';
 
 /**
@@ -65,16 +65,13 @@ import {
  * ```
  */
 export function estimateComputeUnitLimitFactory({
-  rpc,
+    rpc,
 }: EstimateComputeUnitLimitFactoryConfig): EstimateComputeUnitLimitFactoryFunction {
-  return async function estimateComputeUnitLimitFactoryFunction(
-    transactionMessage,
-    config
-  ) {
-    return await estimateComputeUnitLimit({
-      ...config,
-      rpc,
-      transactionMessage,
-    });
-  };
+    return async function estimateComputeUnitLimitFactoryFunction(transactionMessage, config) {
+        return await estimateComputeUnitLimit({
+            ...config,
+            rpc,
+            transactionMessage,
+        });
+    };
 }
