@@ -29,7 +29,6 @@ const unchangedGlobs = [
   'clients/rust/tests/*',
   'program/**/*',
   'program/*',
-  'scripts/generate-clients.mjs',
   'scripts/generate-idls.mjs',
   'scripts/upgrade-template.mjs',
   'scripts/program/*',
