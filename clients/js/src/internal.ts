@@ -1,5 +1,5 @@
 import {
-    BaseTransactionMessage,
+    TransactionMessage,
     getU32Decoder,
     getU64Decoder,
     Instruction,
@@ -19,7 +19,7 @@ import {
  * and its set limit, if any.
  */
 export function getSetComputeUnitLimitInstructionIndexAndUnits(
-    transactionMessage: BaseTransactionMessage,
+    transactionMessage: TransactionMessage,
 ): { index: number; units: number } | null {
     const index = getSetComputeUnitLimitInstructionIndex(transactionMessage);
     if (index < 0) {
@@ -34,7 +34,7 @@ export function getSetComputeUnitLimitInstructionIndexAndUnits(
 /**
  * Finds the index of the first `SetComputeUnitLimit` instruction in a transaction message, if any.
  */
-export function getSetComputeUnitLimitInstructionIndex(transactionMessage: BaseTransactionMessage) {
+export function getSetComputeUnitLimitInstructionIndex(transactionMessage: TransactionMessage) {
     return transactionMessage.instructions.findIndex(isSetComputeUnitLimitInstruction);
 }
 
@@ -56,7 +56,7 @@ export function isSetComputeUnitLimitInstruction(
  * and its set micro-lamports, if any.
  */
 export function getSetComputeUnitPriceInstructionIndexAndMicroLamports(
-    transactionMessage: BaseTransactionMessage,
+    transactionMessage: TransactionMessage,
 ): { index: number; microLamports: MicroLamports } | null {
     const index = getSetComputeUnitPriceInstructionIndex(transactionMessage);
     if (index < 0) {
@@ -74,7 +74,7 @@ export function getSetComputeUnitPriceInstructionIndexAndMicroLamports(
 /**
  * Finds the index of the first `SetComputeUnitPrice` instruction in a transaction message, if any.
  */
-export function getSetComputeUnitPriceInstructionIndex(transactionMessage: BaseTransactionMessage) {
+export function getSetComputeUnitPriceInstructionIndex(transactionMessage: TransactionMessage) {
     return transactionMessage.instructions.findIndex(isSetComputeUnitPriceInstruction);
 }
 

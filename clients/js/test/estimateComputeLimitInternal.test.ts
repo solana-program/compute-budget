@@ -1,7 +1,7 @@
 import {
     AccountRole,
     Address,
-    BaseTransactionMessage,
+    TransactionMessage,
     Blockhash,
     compileTransaction,
     Nonce,
@@ -39,7 +39,7 @@ const MOCK_BLOCKHASH_LIFETIME_CONSTRAINT = {
 
 describe('estimateComputeUnitLimit', () => {
     let sendSimulateTransactionRequest: Mock;
-    let mockTransactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer;
+    let mockTransactionMessage: TransactionMessage & TransactionMessageWithFeePayer;
     let rpc: Rpc<SimulateTransactionApi>;
     let simulateTransaction: Mock;
 

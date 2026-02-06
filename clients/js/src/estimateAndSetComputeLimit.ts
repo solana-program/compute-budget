@@ -1,4 +1,4 @@
-import { BaseTransactionMessage, TransactionMessageWithFeePayer } from '@solana/kit';
+import { TransactionMessage, TransactionMessageWithFeePayer } from '@solana/kit';
 import { MAX_COMPUTE_UNIT_LIMIT, PROVISORY_COMPUTE_UNIT_LIMIT } from './constants';
 import {
     EstimateComputeUnitLimitFactoryFunction,
@@ -8,7 +8,7 @@ import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
 import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 
 type EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction = <
-    TTransactionMessage extends BaseTransactionMessage & TransactionMessageWithFeePayer,
+    TTransactionMessage extends TransactionMessage & TransactionMessageWithFeePayer,
 >(
     transactionMessage: TTransactionMessage,
     config?: EstimateComputeUnitLimitFactoryFunctionConfig,

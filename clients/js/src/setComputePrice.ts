@@ -1,4 +1,4 @@
-import { appendTransactionMessageInstruction, BaseTransactionMessage, MicroLamports } from '@solana/kit';
+import { appendTransactionMessageInstruction, TransactionMessage, MicroLamports } from '@solana/kit';
 import { getSetComputeUnitPriceInstruction } from './generated';
 import { getSetComputeUnitPriceInstructionIndexAndMicroLamports } from './internal';
 
@@ -14,7 +14,7 @@ import { getSetComputeUnitPriceInstructionIndexAndMicroLamports } from './intern
  * );
  * ```
  */
-export function setTransactionMessageComputeUnitPrice<TTransactionMessage extends BaseTransactionMessage>(
+export function setTransactionMessageComputeUnitPrice<TTransactionMessage extends TransactionMessage>(
     microLamports: number | bigint,
     transactionMessage: TTransactionMessage,
 ) {
@@ -42,7 +42,7 @@ export function setTransactionMessageComputeUnitPrice<TTransactionMessage extend
  * );
  * ```
  */
-export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage extends BaseTransactionMessage>(
+export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage extends TransactionMessage>(
     microLamports: MicroLamports | ((previousMicroLamports: MicroLamports | null) => MicroLamports),
     transactionMessage: TTransactionMessage,
 ): TTransactionMessage {
@@ -56,7 +56,7 @@ export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage
                 microLamports: getMicroLamports(null),
             }),
             transactionMessage,
-        ) as unknown as TTransactionMessage;
+        ) as TTransactionMessage;
     }
 
     const { index, microLamports: previousMicroLamports } = instructionDetails;
@@ -73,5 +73,5 @@ export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage
     return Object.freeze({
         ...transactionMessage,
         instructions: newInstructions,
-    });
+    }) as TTransactionMessage;
 }

@@ -1,10 +1,4 @@
-import {
-    Address,
-    BaseTransactionMessage,
-    Rpc,
-    SimulateTransactionApi,
-    TransactionMessageWithFeePayer,
-} from '@solana/kit';
+import { Address, TransactionMessage, Rpc, SimulateTransactionApi, TransactionMessageWithFeePayer } from '@solana/kit';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
     estimateAndUpdateProvisoryComputeUnitLimitFactory,
@@ -20,7 +14,7 @@ const FOREVER_PROMISE = new Promise(() => {
 
 describe('estimateAndUpdateProvisoryComputeUnitLimitFactory', () => {
     let sendSimulateTransactionRequest: Mock;
-    let mockTransactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer;
+    let mockTransactionMessage: TransactionMessage & TransactionMessageWithFeePayer;
     let rpc: Rpc<SimulateTransactionApi>;
     let simulateTransaction: Mock;
 

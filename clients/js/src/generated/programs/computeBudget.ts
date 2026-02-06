@@ -6,8 +6,20 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import { containsBytes, getU8Encoder, type Address, type ReadonlyUint8Array } from '@solana/kit';
 import {
+    containsBytes,
+    getU8Encoder,
+    type Address,
+    type Instruction,
+    type InstructionWithData,
+    type ReadonlyUint8Array,
+} from '@solana/kit';
+import {
+    parseRequestHeapFrameInstruction,
+    parseRequestUnitsInstruction,
+    parseSetComputeUnitLimitInstruction,
+    parseSetComputeUnitPriceInstruction,
+    parseSetLoadedAccountsDataSizeLimitInstruction,
     type ParsedRequestHeapFrameInstruction,
     type ParsedRequestUnitsInstruction,
     type ParsedSetComputeUnitLimitInstruction,
@@ -60,3 +72,43 @@ export type ParsedComputeBudgetInstruction<TProgram extends string = 'ComputeBud
     | ({
           instructionType: ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
       } & ParsedSetLoadedAccountsDataSizeLimitInstruction<TProgram>);
+
+export function parseComputeBudgetInstruction<TProgram extends string>(
+    instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>,
+): ParsedComputeBudgetInstruction<TProgram> {
+    const instructionType = identifyComputeBudgetInstruction(instruction);
+    switch (instructionType) {
+        case ComputeBudgetInstruction.RequestUnits: {
+            return {
+                instructionType: ComputeBudgetInstruction.RequestUnits,
+                ...parseRequestUnitsInstruction(instruction),
+            };
+        }
+        case ComputeBudgetInstruction.RequestHeapFrame: {
+            return {
+                instructionType: ComputeBudgetInstruction.RequestHeapFrame,
+                ...parseRequestHeapFrameInstruction(instruction),
+            };
+        }
+        case ComputeBudgetInstruction.SetComputeUnitLimit: {
+            return {
+                instructionType: ComputeBudgetInstruction.SetComputeUnitLimit,
+                ...parseSetComputeUnitLimitInstruction(instruction),
+            };
+        }
+        case ComputeBudgetInstruction.SetComputeUnitPrice: {
+            return {
+                instructionType: ComputeBudgetInstruction.SetComputeUnitPrice,
+                ...parseSetComputeUnitPriceInstruction(instruction),
+            };
+        }
+        case ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit: {
+            return {
+                instructionType: ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit,
+                ...parseSetLoadedAccountsDataSizeLimitInstruction(instruction),
+            };
+        }
+        default:
+            throw new Error(`Unrecognized instruction type: ${instructionType as string}`);
+    }
+}
