@@ -1,4 +1,4 @@
-import { appendTransactionMessageInstruction, BaseTransactionMessage } from '@solana/kit';
+import { appendTransactionMessageInstruction, TransactionMessage } from '@solana/kit';
 import { PROVISORY_COMPUTE_UNIT_LIMIT } from './constants';
 import { getSetComputeUnitLimitInstruction } from './generated';
 import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
@@ -17,7 +17,7 @@ import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
  * );
  * ```
  */
-export function fillProvisorySetComputeUnitLimitInstruction<TTransactionMessage extends BaseTransactionMessage>(
+export function fillProvisorySetComputeUnitLimitInstruction<TTransactionMessage extends TransactionMessage>(
     transactionMessage: TTransactionMessage,
 ) {
     return updateOrAppendSetComputeUnitLimitInstruction(
@@ -44,7 +44,7 @@ export function fillProvisorySetComputeUnitLimitInstruction<TTransactionMessage 
  * );
  * ```
  */
-export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage extends BaseTransactionMessage>(
+export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage extends TransactionMessage>(
     units: number | ((previousUnits: number | null) => number),
     transactionMessage: TTransactionMessage,
 ): TTransactionMessage {
@@ -56,7 +56,7 @@ export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage
         return appendTransactionMessageInstruction(
             getSetComputeUnitLimitInstruction({ units: getUnits(null) }),
             transactionMessage,
-        ) as unknown as TTransactionMessage;
+        ) as TTransactionMessage;
     }
 
     const { index, units: previousUnits } = instructionDetails;
@@ -71,5 +71,5 @@ export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage
     return Object.freeze({
         ...transactionMessage,
         instructions: newInstructions,
-    });
+    }) as TTransactionMessage;
 }

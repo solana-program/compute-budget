@@ -1,5 +1,5 @@
 import {
-    BaseTransactionMessage,
+    TransactionMessage,
     Commitment,
     compileTransaction,
     getBase64EncodedWireTransaction,
@@ -25,7 +25,7 @@ export type EstimateComputeUnitLimitFactoryConfig = Readonly<{
 }>;
 
 export type EstimateComputeUnitLimitFactoryFunction = (
-    transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer,
+    transactionMessage: TransactionMessage & TransactionMessageWithFeePayer,
     config?: EstimateComputeUnitLimitFactoryFunctionConfig,
 ) => Promise<number>;
 
@@ -50,7 +50,7 @@ export type EstimateComputeUnitLimitFactoryFunctionConfig = {
 type EstimateComputeUnitLimitConfig = EstimateComputeUnitLimitFactoryFunctionConfig &
     Readonly<{
         rpc: Rpc<SimulateTransactionApi>;
-        transactionMessage: BaseTransactionMessage & TransactionMessageWithFeePayer;
+        transactionMessage: TransactionMessage & TransactionMessageWithFeePayer;
     }>;
 
 /**

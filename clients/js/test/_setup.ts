@@ -1,15 +1,16 @@
 import {
-    BaseTransactionMessage,
     Commitment,
     Rpc,
     RpcSubscriptions,
     SolanaRpcApi,
     SolanaRpcSubscriptionsApi,
+    TransactionMessage,
     TransactionMessageWithBlockhashLifetime,
     TransactionMessageWithFeePayer,
     TransactionSigner,
     airdropFactory,
     assertIsSendableTransaction,
+    assertIsTransactionWithBlockhashLifetime,
     createSolanaRpc,
     createSolanaRpcSubscriptions,
     createTransactionMessage,
@@ -55,16 +56,13 @@ export const createDefaultTransaction = async (client: Client, feePayer: Transac
 
 export const signAndSendTransaction = async (
     client: Client,
-    transactionMessage: BaseTransactionMessage &
-        TransactionMessageWithFeePayer &
-        TransactionMessageWithBlockhashLifetime,
+    transactionMessage: TransactionMessage & TransactionMessageWithFeePayer & TransactionMessageWithBlockhashLifetime,
     commitment: Commitment = 'confirmed',
 ) => {
     const signedTransaction = await signTransactionMessageWithSigners(transactionMessage);
     const signature = getSignatureFromTransaction(signedTransaction);
     assertIsSendableTransaction(signedTransaction);
-    await sendAndConfirmTransactionFactory(client)(signedTransaction, {
-        commitment,
-    });
+    assertIsTransactionWithBlockhashLifetime(signedTransaction);
+    await sendAndConfirmTransactionFactory(client)(signedTransaction, { commitment });
     return signature;
 };
