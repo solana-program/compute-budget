@@ -34,9 +34,7 @@ export function findSetComputeUnitLimitInstructionIndexAndUnits(
 /**
  * Checks if the given instruction is a `SetComputeUnitLimit` instruction.
  */
-export function isSetComputeUnitLimitInstruction(
-    instruction: Instruction,
-): instruction is SetComputeUnitLimitInstruction {
+function isSetComputeUnitLimitInstruction(instruction: Instruction): instruction is SetComputeUnitLimitInstruction {
     return (
         instruction.programAddress === COMPUTE_BUDGET_PROGRAM_ADDRESS &&
         identifyComputeBudgetInstruction(instruction.data as Uint8Array) ===
