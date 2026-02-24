@@ -9,12 +9,23 @@
 import {
     containsBytes,
     getU8Encoder,
+    SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
+    SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
+    SolanaError,
     type Address,
+    type ClientWithTransactionPlanning,
+    type ClientWithTransactionSending,
     type Instruction,
     type InstructionWithData,
     type ReadonlyUint8Array,
 } from '@solana/kit';
+import { addSelfPlanAndSendFunctions, type SelfPlanAndSendFunctions } from '@solana/kit/program-client-core';
 import {
+    getRequestHeapFrameInstruction,
+    getRequestUnitsInstruction,
+    getSetComputeUnitLimitInstruction,
+    getSetComputeUnitPriceInstruction,
+    getSetLoadedAccountsDataSizeLimitInstruction,
     parseRequestHeapFrameInstruction,
     parseRequestUnitsInstruction,
     parseSetComputeUnitLimitInstruction,
@@ -25,6 +36,11 @@ import {
     type ParsedSetComputeUnitLimitInstruction,
     type ParsedSetComputeUnitPriceInstruction,
     type ParsedSetLoadedAccountsDataSizeLimitInstruction,
+    type RequestHeapFrameInput,
+    type RequestUnitsInput,
+    type SetComputeUnitLimitInput,
+    type SetComputeUnitPriceInput,
+    type SetLoadedAccountsDataSizeLimitInput,
 } from '../instructions';
 
 export const COMPUTE_BUDGET_PROGRAM_ADDRESS =
@@ -57,7 +73,10 @@ export function identifyComputeBudgetInstruction(
     if (containsBytes(data, getU8Encoder().encode(4), 0)) {
         return ComputeBudgetInstruction.SetLoadedAccountsDataSizeLimit;
     }
-    throw new Error('The provided instruction could not be identified as a computeBudget instruction.');
+    throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION, {
+        instructionData: data,
+        programName: 'computeBudget',
+    });
 }
 
 export type ParsedComputeBudgetInstruction<TProgram extends string = 'ComputeBudget111111111111111111111111111111'> =
@@ -109,6 +128,52 @@ export function parseComputeBudgetInstruction<TProgram extends string>(
             };
         }
         default:
-            throw new Error(`Unrecognized instruction type: ${instructionType as string}`);
+            throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE, {
+                instructionType: instructionType as string,
+                programName: 'computeBudget',
+            });
     }
+}
+
+export type ComputeBudgetPlugin = { instructions: ComputeBudgetPluginInstructions };
+
+export type ComputeBudgetPluginInstructions = {
+    requestUnits: (
+        input: RequestUnitsInput,
+    ) => ReturnType<typeof getRequestUnitsInstruction> & SelfPlanAndSendFunctions;
+    requestHeapFrame: (
+        input: RequestHeapFrameInput,
+    ) => ReturnType<typeof getRequestHeapFrameInstruction> & SelfPlanAndSendFunctions;
+    setComputeUnitLimit: (
+        input: SetComputeUnitLimitInput,
+    ) => ReturnType<typeof getSetComputeUnitLimitInstruction> & SelfPlanAndSendFunctions;
+    setComputeUnitPrice: (
+        input: SetComputeUnitPriceInput,
+    ) => ReturnType<typeof getSetComputeUnitPriceInstruction> & SelfPlanAndSendFunctions;
+    setLoadedAccountsDataSizeLimit: (
+        input: SetLoadedAccountsDataSizeLimitInput,
+    ) => ReturnType<typeof getSetLoadedAccountsDataSizeLimitInstruction> & SelfPlanAndSendFunctions;
+};
+
+export type ComputeBudgetPluginRequirements = ClientWithTransactionPlanning & ClientWithTransactionSending;
+
+export function computeBudgetProgram() {
+    return <T extends ComputeBudgetPluginRequirements>(client: T) => {
+        return {
+            ...client,
+            computeBudget: <ComputeBudgetPlugin>{
+                instructions: {
+                    requestUnits: input => addSelfPlanAndSendFunctions(client, getRequestUnitsInstruction(input)),
+                    requestHeapFrame: input =>
+                        addSelfPlanAndSendFunctions(client, getRequestHeapFrameInstruction(input)),
+                    setComputeUnitLimit: input =>
+                        addSelfPlanAndSendFunctions(client, getSetComputeUnitLimitInstruction(input)),
+                    setComputeUnitPrice: input =>
+                        addSelfPlanAndSendFunctions(client, getSetComputeUnitPriceInstruction(input)),
+                    setLoadedAccountsDataSizeLimit: input =>
+                        addSelfPlanAndSendFunctions(client, getSetLoadedAccountsDataSizeLimitInstruction(input)),
+                },
+            },
+        };
+    };
 }
