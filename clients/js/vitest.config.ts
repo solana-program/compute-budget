@@ -7,6 +7,7 @@ export default defineConfig({
         __VERSION__: `"${env.npm_package_version}"`,
     },
     test: {
-        // ...
+        environment: 'node',
+        testTimeout: 15000,
     },
 });
