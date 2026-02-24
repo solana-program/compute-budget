@@ -1,6 +1,6 @@
 import { appendTransactionMessageInstruction, TransactionMessage, MicroLamports } from '@solana/kit';
 import { getSetComputeUnitPriceInstruction } from './generated';
-import { getSetComputeUnitPriceInstructionIndexAndMicroLamports } from './internal';
+import { findSetComputeUnitPriceInstructionIndexAndMicroLamports } from './introspect';
 
 /**
  * Sets the compute unit price of a transaction message in micro-Lamports.
@@ -48,7 +48,7 @@ export function updateOrAppendSetComputeUnitPriceInstruction<TTransactionMessage
 ): TTransactionMessage {
     const getMicroLamports = (previousMicroLamports: MicroLamports | null): MicroLamports =>
         typeof microLamports === 'function' ? microLamports(previousMicroLamports) : microLamports;
-    const instructionDetails = getSetComputeUnitPriceInstructionIndexAndMicroLamports(transactionMessage);
+    const instructionDetails = findSetComputeUnitPriceInstructionIndexAndMicroLamports(transactionMessage);
 
     if (!instructionDetails) {
         return appendTransactionMessageInstruction(

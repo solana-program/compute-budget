@@ -4,7 +4,7 @@ import {
     EstimateComputeUnitLimitFactoryFunction,
     EstimateComputeUnitLimitFactoryFunctionConfig,
 } from './estimateComputeLimitInternal';
-import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
+import { findSetComputeUnitLimitInstructionIndexAndUnits } from './introspect';
 import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 
 type EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction = <
@@ -36,7 +36,7 @@ export function estimateAndUpdateProvisoryComputeUnitLimitFactory(
     estimateComputeUnitLimit: EstimateComputeUnitLimitFactoryFunction,
 ): EstimateAndUpdateProvisoryComputeUnitLimitFactoryFunction {
     return async function fn(transactionMessage, config) {
-        const instructionDetails = getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
+        const instructionDetails = findSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
 
         // If the transaction message already has a compute unit limit instruction
         // which is set to a specific value — i.e. not 0 or the maximum limit —

@@ -18,10 +18,10 @@ import {
  * Finds the index of the first `SetComputeUnitLimit` instruction in a transaction message
  * and its set limit, if any.
  */
-export function getSetComputeUnitLimitInstructionIndexAndUnits(
+export function findSetComputeUnitLimitInstructionIndexAndUnits(
     transactionMessage: TransactionMessage,
 ): { index: number; units: number } | null {
-    const index = getSetComputeUnitLimitInstructionIndex(transactionMessage);
+    const index = transactionMessage.instructions.findIndex(isSetComputeUnitLimitInstruction);
     if (index < 0) {
         return null;
     }
@@ -29,13 +29,6 @@ export function getSetComputeUnitLimitInstructionIndexAndUnits(
     const units = getU32Decoder().decode(transactionMessage.instructions[index].data as ReadonlyUint8Array, 1);
 
     return { index, units };
-}
-
-/**
- * Finds the index of the first `SetComputeUnitLimit` instruction in a transaction message, if any.
- */
-export function getSetComputeUnitLimitInstructionIndex(transactionMessage: TransactionMessage) {
-    return transactionMessage.instructions.findIndex(isSetComputeUnitLimitInstruction);
 }
 
 /**
@@ -55,10 +48,10 @@ export function isSetComputeUnitLimitInstruction(
  * Finds the index of the first `SetComputeUnitPrice` instruction in a transaction message
  * and its set micro-lamports, if any.
  */
-export function getSetComputeUnitPriceInstructionIndexAndMicroLamports(
+export function findSetComputeUnitPriceInstructionIndexAndMicroLamports(
     transactionMessage: TransactionMessage,
 ): { index: number; microLamports: MicroLamports } | null {
-    const index = getSetComputeUnitPriceInstructionIndex(transactionMessage);
+    const index = transactionMessage.instructions.findIndex(isSetComputeUnitPriceInstruction);
     if (index < 0) {
         return null;
     }
@@ -72,18 +65,9 @@ export function getSetComputeUnitPriceInstructionIndexAndMicroLamports(
 }
 
 /**
- * Finds the index of the first `SetComputeUnitPrice` instruction in a transaction message, if any.
- */
-export function getSetComputeUnitPriceInstructionIndex(transactionMessage: TransactionMessage) {
-    return transactionMessage.instructions.findIndex(isSetComputeUnitPriceInstruction);
-}
-
-/**
  * Checks if the given instruction is a `SetComputeUnitPrice` instruction.
  */
-export function isSetComputeUnitPriceInstruction(
-    instruction: Instruction,
-): instruction is SetComputeUnitPriceInstruction {
+function isSetComputeUnitPriceInstruction(instruction: Instruction): instruction is SetComputeUnitPriceInstruction {
     return (
         instruction.programAddress === COMPUTE_BUDGET_PROGRAM_ADDRESS &&
         identifyComputeBudgetInstruction(instruction.data as Uint8Array) ===
