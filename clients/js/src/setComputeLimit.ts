@@ -1,7 +1,7 @@
 import { appendTransactionMessageInstruction, TransactionMessage } from '@solana/kit';
 import { PROVISORY_COMPUTE_UNIT_LIMIT } from './constants';
 import { getSetComputeUnitLimitInstruction } from './generated';
-import { getSetComputeUnitLimitInstructionIndexAndUnits } from './internal';
+import { findSetComputeUnitLimitInstructionIndexAndUnits } from './introspect';
 
 /**
  * Appends a `SetComputeUnitLimit` instruction with a provisory
@@ -50,7 +50,7 @@ export function updateOrAppendSetComputeUnitLimitInstruction<TTransactionMessage
 ): TTransactionMessage {
     const getUnits = (previousUnits: number | null): number =>
         typeof units === 'function' ? units(previousUnits) : units;
-    const instructionDetails = getSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
+    const instructionDetails = findSetComputeUnitLimitInstructionIndexAndUnits(transactionMessage);
 
     if (!instructionDetails) {
         return appendTransactionMessageInstruction(
