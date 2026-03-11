@@ -236,22 +236,27 @@ describe('estimateComputeUnitLimit', () => {
         await expect(estimatePromise).resolves.toBe(1400000);
     });
 
-    it('throws with the transaction SolanaError as cause when the transaction fails in simulation', async () => {
+    it('throws with the full simulation data when the transaction fails in simulation', async () => {
         expect.assertions(1);
         const transactionError: TransactionError = 'AccountNotFound';
-        sendSimulateTransactionRequest.mockResolvedValue({
-            value: { err: transactionError, unitsConsumed: 42n },
-        });
+        const { err, ...mockSimulationResult } = {
+            accounts: null,
+            err: transactionError,
+            innerInstructions: null,
+            loadedAccountsDataSize: 42,
+            logs: ['Program log: Simulated'],
+            replacementBlockhash: null,
+            returnData: null,
+            unitsConsumed: 42n,
+        };
+        sendSimulateTransactionRequest.mockResolvedValue({ value: { err, ...mockSimulationResult } });
 
-        const estimatePromise = estimateComputeUnitLimit({
-            rpc,
-            transactionMessage: mockTransactionMessage,
-        });
+        const estimatePromise = estimateComputeUnitLimit({ rpc, transactionMessage: mockTransactionMessage });
 
         await expect(estimatePromise).rejects.toThrow(
             new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
                 cause: new SolanaError(SOLANA_ERROR__TRANSACTION_ERROR__ACCOUNT_NOT_FOUND),
-                unitsConsumed: 42,
+                ...mockSimulationResult,
             }),
         );
     });

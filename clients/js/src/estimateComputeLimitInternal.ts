@@ -8,6 +8,7 @@ import {
     isTransactionMessageWithDurableNonceLifetime,
     pipe,
     Rpc,
+    RpcSimulateTransactionResult,
     SimulateTransactionApi,
     Slot,
     SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT,
@@ -140,30 +141,24 @@ async function simulateTransactionAndGetConsumedUnits({
     const wireTransactionBytes = getBase64EncodedWireTransaction(transaction);
 
     try {
-        const {
-            value: { err: transactionError, unitsConsumed },
-        } = await rpc
-            .simulateTransaction(wireTransactionBytes, {
-                ...simulateConfig,
-                encoding: 'base64',
-                sigVerify: false,
-            })
+        const response = await rpc
+            .simulateTransaction(wireTransactionBytes, { ...simulateConfig, encoding: 'base64', sigVerify: false })
             .send({ abortSignal });
-        if (unitsConsumed == null) {
+        const { err: transactionError, ...simulationResult } = response.value as RpcSimulateTransactionResult;
+        if (simulationResult.unitsConsumed == null) {
             // This should never be hit, because all RPCs should support `unitsConsumed` by now.
             throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT);
+        }
+        if (transactionError) {
+            throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
+                ...simulationResult,
+                cause: getSolanaErrorFromTransactionError(transactionError),
+            });
         }
         // FIXME(https://github.com/anza-xyz/agave/issues/1295): The simulation response returns
         // compute units as a u64, but the `SetComputeLimit` instruction only accepts a u32. Until
         // this changes, downcast it.
-        const downcastUnitsConsumed = unitsConsumed > 4_294_967_295n ? 4_294_967_295 : Number(unitsConsumed);
-        if (transactionError) {
-            throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT, {
-                cause: getSolanaErrorFromTransactionError(transactionError),
-                unitsConsumed: downcastUnitsConsumed,
-            });
-        }
-        return downcastUnitsConsumed;
+        return simulationResult.unitsConsumed > 4_294_967_295n ? 4_294_967_295 : Number(simulationResult.unitsConsumed);
     } catch (e) {
         if (isSolanaError(e, SOLANA_ERROR__TRANSACTION__FAILED_WHEN_SIMULATING_TO_ESTIMATE_COMPUTE_LIMIT)) throw e;
         throw new SolanaError(SOLANA_ERROR__TRANSACTION__FAILED_TO_ESTIMATE_COMPUTE_LIMIT, { cause: e });
