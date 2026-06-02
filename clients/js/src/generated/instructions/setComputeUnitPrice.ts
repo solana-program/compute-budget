@@ -29,7 +29,7 @@ import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR = 3;
 
-export function getSetComputeUnitPriceDiscriminatorBytes() {
+export function getSetComputeUnitPriceDiscriminatorBytes(): ReadonlyUint8Array {
     return getU8Encoder().encode(SET_COMPUTE_UNIT_PRICE_DISCRIMINATOR);
 }
 

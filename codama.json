@@ -9,10 +9,11 @@
         "rust": {
             "from": "@codama/renderers-rust",
             "args": [
-                "clients/rust/src/generated",
+                "clients/rust",
                 {
-                    "crateFolder": "clients/rust",
-                    "formatCode": true
+                    "anchorTraits": false,
+                    "formatCode": true,
+                    "toolchain": "+nightly-2026-01-22"
                 }
             ]
         }
