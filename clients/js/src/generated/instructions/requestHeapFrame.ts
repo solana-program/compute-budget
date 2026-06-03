@@ -29,7 +29,7 @@ import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const REQUEST_HEAP_FRAME_DISCRIMINATOR = 1;
 
-export function getRequestHeapFrameDiscriminatorBytes() {
+export function getRequestHeapFrameDiscriminatorBytes(): ReadonlyUint8Array {
     return getU8Encoder().encode(REQUEST_HEAP_FRAME_DISCRIMINATOR);
 }
 

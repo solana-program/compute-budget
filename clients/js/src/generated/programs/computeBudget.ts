@@ -8,6 +8,7 @@
 
 import {
     containsBytes,
+    extendClient,
     getU8Encoder,
     SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION,
     SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE,
@@ -158,9 +159,10 @@ export type ComputeBudgetPluginInstructions = {
 export type ComputeBudgetPluginRequirements = ClientWithTransactionPlanning & ClientWithTransactionSending;
 
 export function computeBudgetProgram() {
-    return <T extends ComputeBudgetPluginRequirements>(client: T) => {
-        return {
-            ...client,
+    return <T extends ComputeBudgetPluginRequirements>(
+        client: T,
+    ): Omit<T, 'computeBudget'> & { computeBudget: ComputeBudgetPlugin } => {
+        return extendClient(client, {
             computeBudget: <ComputeBudgetPlugin>{
                 instructions: {
                     requestUnits: input => addSelfPlanAndSendFunctions(client, getRequestUnitsInstruction(input)),
@@ -174,6 +176,6 @@ export function computeBudgetProgram() {
                         addSelfPlanAndSendFunctions(client, getSetLoadedAccountsDataSizeLimitInstruction(input)),
                 },
             },
-        };
+        });
     };
 }

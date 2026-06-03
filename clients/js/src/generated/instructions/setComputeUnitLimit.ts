@@ -29,7 +29,7 @@ import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR = 2;
 
-export function getSetComputeUnitLimitDiscriminatorBytes() {
+export function getSetComputeUnitLimitDiscriminatorBytes(): ReadonlyUint8Array {
     return getU8Encoder().encode(SET_COMPUTE_UNIT_LIMIT_DISCRIMINATOR);
 }
 

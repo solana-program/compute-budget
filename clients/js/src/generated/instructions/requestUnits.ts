@@ -29,7 +29,7 @@ import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from '../programs';
 
 export const REQUEST_UNITS_DISCRIMINATOR = 0;
 
-export function getRequestUnitsDiscriminatorBytes() {
+export function getRequestUnitsDiscriminatorBytes(): ReadonlyUint8Array {
     return getU8Encoder().encode(REQUEST_UNITS_DISCRIMINATOR);
 }
 

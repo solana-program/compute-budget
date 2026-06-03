@@ -8,6 +8,8 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const REQUEST_HEAP_FRAME_DISCRIMINATOR: u8 = 1;
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RequestHeapFrame {}
@@ -16,7 +18,7 @@ impl RequestHeapFrame {
     pub fn instruction(
         &self,
         args: RequestHeapFrameInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -24,15 +26,15 @@ impl RequestHeapFrame {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: RequestHeapFrameInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(remaining_accounts.len());
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = borsh::to_vec(&RequestHeapFrameInstructionData::new()).unwrap();
-        let mut args = borsh::to_vec(&args).unwrap();
+        let mut data = RequestHeapFrameInstructionData::new().try_to_vec().unwrap();
+        let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::COMPUTE_BUDGET_ID,
             accounts,
             data,
@@ -41,7 +43,6 @@ impl RequestHeapFrame {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RequestHeapFrameInstructionData {
     discriminator: u8,
 }
@@ -49,6 +50,10 @@ pub struct RequestHeapFrameInstructionData {
 impl RequestHeapFrameInstructionData {
     pub fn new() -> Self {
         Self { discriminator: 1 }
+    }
+
+    pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
+        borsh::to_vec(self)
     }
 }
 
@@ -59,9 +64,14 @@ impl Default for RequestHeapFrameInstructionData {
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RequestHeapFrameInstructionArgs {
     pub bytes: u32,
+}
+
+impl RequestHeapFrameInstructionArgs {
+    pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
+        borsh::to_vec(self)
+    }
 }
 
 /// Instruction builder for `RequestHeapFrame`.
@@ -71,7 +81,7 @@ pub struct RequestHeapFrameInstructionArgs {
 #[derive(Clone, Debug, Default)]
 pub struct RequestHeapFrameBuilder {
     bytes: Option<u32>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RequestHeapFrameBuilder {
@@ -85,10 +95,7 @@ impl RequestHeapFrameBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -96,13 +103,13 @@ impl RequestHeapFrameBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RequestHeapFrame {};
         let args = RequestHeapFrameInstructionArgs {
             bytes: self.bytes.clone().expect("bytes is not set"),
@@ -115,14 +122,14 @@ impl RequestHeapFrameBuilder {
 /// `request_heap_frame` CPI instruction.
 pub struct RequestHeapFrameCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: RequestHeapFrameInstructionArgs,
 }
 
 impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         args: RequestHeapFrameInstructionArgs,
     ) -> Self {
         Self {
@@ -131,25 +138,18 @@ impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -158,25 +158,21 @@ impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(remaining_accounts.len());
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = borsh::to_vec(&RequestHeapFrameInstructionData::new()).unwrap();
-        let mut args = borsh::to_vec(&self.__args).unwrap();
+        let mut data = RequestHeapFrameInstructionData::new().try_to_vec().unwrap();
+        let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::COMPUTE_BUDGET_ID,
             accounts,
             data,
@@ -188,9 +184,9 @@ impl<'a, 'b> RequestHeapFrameCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -205,7 +201,7 @@ pub struct RequestHeapFrameCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RequestHeapFrameCpiBuilderInstruction {
             __program: program,
             bytes: None,
@@ -222,7 +218,7 @@ impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -238,11 +234,7 @@ impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -250,15 +242,12 @@ impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = RequestHeapFrameInstructionArgs {
             bytes: self.instruction.bytes.clone().expect("bytes is not set"),
         };
@@ -275,12 +264,8 @@ impl<'a, 'b> RequestHeapFrameCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RequestHeapFrameCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
     bytes: Option<u32>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }
