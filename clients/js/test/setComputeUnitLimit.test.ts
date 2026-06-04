@@ -1,27 +1,13 @@
-import { appendTransactionMessageInstruction, pipe } from '@solana/kit';
 import { expect, test } from 'vitest';
-import { getSetComputeUnitLimitInstruction } from '../src';
-import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
-} from './_setup';
+
+import { createTestClient } from './_setup';
 
 test('it sets the compute unit limit of a transaction', async () => {
-    // Given a payer wallet.
-    const client = createDefaultSolanaClient();
-    const payer = await generateKeyPairSignerWithSol(client);
+    // Given a test client with a funded payer.
+    const client = await createTestClient();
 
-    // When we create a transaction with a compute unit limit of 600,000.
-    const setComputeUnit = getSetComputeUnitLimitInstruction({
-        units: 600_000,
-    });
-    const promise = pipe(
-        await createDefaultTransaction(client, payer),
-        tx => appendTransactionMessageInstruction(setComputeUnit, tx),
-        tx => signAndSendTransaction(client, tx),
-    );
+    // When we send a transaction that sets a compute unit limit of 600,000.
+    const promise = client.computeBudget.instructions.setComputeUnitLimit({ units: 600_000 }).sendTransaction();
 
     // Then the transaction was successful.
     await expect(promise).resolves.toBeTruthy();
