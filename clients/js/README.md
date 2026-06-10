@@ -7,7 +7,7 @@ A generated JavaScript library for the Compute Budget program.
 The JS client tests use [LiteSVM](https://github.com/LiteSVM/litesvm) in-process, so no local validator is needed. To build and test your JavaScript client from the root of the repository, you may use the following command.
 
 ```sh
-pnpm clients:js:test
+make test-js-clients-js
 ```
 
 This installs dependencies, builds the client, and runs the test suite.
