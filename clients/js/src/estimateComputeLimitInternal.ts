@@ -17,8 +17,9 @@ import {
     Transaction,
     TransactionMessageWithFeePayer,
 } from '@solana/kit';
-import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
+
 import { MAX_COMPUTE_UNIT_LIMIT } from './constants';
+import { updateOrAppendSetComputeUnitLimitInstruction } from './setComputeLimit';
 
 export type EstimateComputeUnitLimitFactoryConfig = Readonly<{
     /** An object that supports the {@link SimulateTransactionApi} of the Solana RPC API */
