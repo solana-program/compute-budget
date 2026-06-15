@@ -1,4 +1,5 @@
 import { appendTransactionMessageInstruction, TransactionMessage, MicroLamports } from '@solana/kit';
+
 import { getSetComputeUnitPriceInstruction } from './generated';
 import { findSetComputeUnitPriceInstructionIndexAndMicroLamports } from './introspect';
 
