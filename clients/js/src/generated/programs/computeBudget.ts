@@ -16,6 +16,7 @@ import {
     type Address,
     type ClientWithTransactionPlanning,
     type ClientWithTransactionSending,
+    type ExtendedClient,
     type Instruction,
     type InstructionWithData,
     type ReadonlyUint8Array,
@@ -136,7 +137,11 @@ export function parseComputeBudgetInstruction<TProgram extends string>(
     }
 }
 
-export type ComputeBudgetPlugin = { instructions: ComputeBudgetPluginInstructions };
+export type ComputeBudgetPlugin = {
+    instructions: ComputeBudgetPluginInstructions;
+    identifyInstruction: typeof identifyComputeBudgetInstruction;
+    parseInstruction: typeof parseComputeBudgetInstruction;
+};
 
 export type ComputeBudgetPluginInstructions = {
     requestUnits: (
@@ -161,7 +166,7 @@ export type ComputeBudgetPluginRequirements = ClientWithTransactionPlanning & Cl
 export function computeBudgetProgram() {
     return <T extends ComputeBudgetPluginRequirements>(
         client: T,
-    ): Omit<T, 'computeBudget'> & { computeBudget: ComputeBudgetPlugin } => {
+    ): ExtendedClient<T, { computeBudget: ComputeBudgetPlugin }> => {
         return extendClient(client, {
             computeBudget: <ComputeBudgetPlugin>{
                 instructions: {
@@ -175,6 +180,8 @@ export function computeBudgetProgram() {
                     setLoadedAccountsDataSizeLimit: input =>
                         addSelfPlanAndSendFunctions(client, getSetLoadedAccountsDataSizeLimitInstruction(input)),
                 },
+                identifyInstruction: identifyComputeBudgetInstruction,
+                parseInstruction: parseComputeBudgetInstruction,
             },
         });
     };
