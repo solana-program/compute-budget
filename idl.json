@@ -19,7 +19,8 @@
             },
             "docs": [],
             "defaultValue": { "kind": "numberValueNode", "number": 0 },
-            "defaultValueStrategy": "omitted"
+            "defaultValueStrategy": "omitted",
+            "display": { "kind": "structFieldDisplayNode", "skip": "always" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -27,9 +28,14 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u32",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "unit": { "kind": "stringValueNode", "string": "CUs" }
+              }
             },
-            "docs": ["Units to request for transaction-wide compute."]
+            "docs": ["Units to request for transaction-wide compute."],
+            "display": { "kind": "structFieldDisplayNode", "label": "Requested CUs" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -37,7 +43,12 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u32",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "decimals": { "kind": "numberValueNode", "number": 9 },
+                "unit": { "kind": "stringValueNode", "string": "SOL" }
+              }
             },
             "docs": ["Prioritization fee lamports."]
           }
@@ -52,7 +63,12 @@
         "name": "requestUnits",
         "idlName": "requestUnits",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "programId",
+        "display": {
+          "kind": "instructionDisplayNode",
+          "intent": "Request compute units",
+          "interpolatedIntent": "Request ${data.units} for a fee of ${data.additionalFee}"
+        }
       },
       {
         "kind": "instructionNode",
@@ -68,7 +84,8 @@
             },
             "docs": [],
             "defaultValue": { "kind": "numberValueNode", "number": 1 },
-            "defaultValueStrategy": "omitted"
+            "defaultValueStrategy": "omitted",
+            "display": { "kind": "structFieldDisplayNode", "skip": "always" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -76,12 +93,17 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u32",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "unit": { "kind": "stringValueNode", "string": "bytes" }
+              }
             },
             "docs": [
               "Requested transaction-wide program heap size in bytes.",
               "Must be multiple of 1024. Applies to each program, including CPIs."
-            ]
+            ],
+            "display": { "kind": "structFieldDisplayNode", "label": "Heap Size" }
           }
         ],
         "discriminators": [
@@ -94,7 +116,12 @@
         "name": "requestHeapFrame",
         "idlName": "requestHeapFrame",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "programId",
+        "display": {
+          "kind": "instructionDisplayNode",
+          "intent": "Request heap frame",
+          "interpolatedIntent": "Request ${data.bytes} of program heap"
+        }
       },
       {
         "kind": "instructionNode",
@@ -110,7 +137,8 @@
             },
             "docs": [],
             "defaultValue": { "kind": "numberValueNode", "number": 2 },
-            "defaultValueStrategy": "omitted"
+            "defaultValueStrategy": "omitted",
+            "display": { "kind": "structFieldDisplayNode", "skip": "always" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -118,9 +146,14 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u32",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "unit": { "kind": "stringValueNode", "string": "CUs" }
+              }
             },
-            "docs": ["Transaction-wide compute unit limit."]
+            "docs": ["Transaction-wide compute unit limit."],
+            "display": { "kind": "structFieldDisplayNode", "label": "CU Limit" }
           }
         ],
         "discriminators": [
@@ -133,7 +166,12 @@
         "name": "setComputeUnitLimit",
         "idlName": "setComputeUnitLimit",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "programId",
+        "display": {
+          "kind": "instructionDisplayNode",
+          "intent": "Set compute unit limit",
+          "interpolatedIntent": "Set the compute unit limit to ${data.units}"
+        }
       },
       {
         "kind": "instructionNode",
@@ -149,7 +187,8 @@
             },
             "docs": [],
             "defaultValue": { "kind": "numberValueNode", "number": 3 },
-            "defaultValueStrategy": "omitted"
+            "defaultValueStrategy": "omitted",
+            "display": { "kind": "structFieldDisplayNode", "skip": "always" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -157,11 +196,16 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u64",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "unit": { "kind": "stringValueNode", "string": "micro-lamports/CU" }
+              }
             },
             "docs": [
               "Transaction compute unit price used for prioritization fees."
-            ]
+            ],
+            "display": { "kind": "structFieldDisplayNode", "label": "CU Price" }
           }
         ],
         "discriminators": [
@@ -174,7 +218,12 @@
         "name": "setComputeUnitPrice",
         "idlName": "setComputeUnitPrice",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "programId",
+        "display": {
+          "kind": "instructionDisplayNode",
+          "intent": "Set compute unit price",
+          "interpolatedIntent": "Set the compute unit price to ${data.microLamports}"
+        }
       },
       {
         "kind": "instructionNode",
@@ -190,7 +239,8 @@
             },
             "docs": [],
             "defaultValue": { "kind": "numberValueNode", "number": 4 },
-            "defaultValueStrategy": "omitted"
+            "defaultValueStrategy": "omitted",
+            "display": { "kind": "structFieldDisplayNode", "skip": "always" }
           },
           {
             "kind": "instructionArgumentNode",
@@ -198,9 +248,14 @@
             "type": {
               "kind": "numberTypeNode",
               "format": "u32",
-              "endian": "le"
+              "endian": "le",
+              "display": {
+                "kind": "amountNumberDisplayNode",
+                "unit": { "kind": "stringValueNode", "string": "bytes" }
+              }
             },
-            "docs": []
+            "docs": [],
+            "display": { "kind": "structFieldDisplayNode", "label": "Data Size Limit" }
           }
         ],
         "discriminators": [
@@ -213,7 +268,12 @@
         "name": "setLoadedAccountsDataSizeLimit",
         "idlName": "setLoadedAccountsDataSizeLimit",
         "docs": [],
-        "optionalAccountStrategy": "programId"
+        "optionalAccountStrategy": "programId",
+        "display": {
+          "kind": "instructionDisplayNode",
+          "intent": "Set loaded accounts data size limit",
+          "interpolatedIntent": "Limit loaded accounts data to ${data.accountDataSizeLimit}"
+        }
       }
     ],
     "definedTypes": [],
