@@ -85,10 +85,11 @@ export type RequestHeapFrameInput = {
 
 export function getRequestHeapFrameInstruction<TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS>(
     input: RequestHeapFrameInput,
-    config?: { programAddress?: TProgramAddress },
+    config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): RequestHeapFrameInstruction<TProgramAddress> {
     // Program address.
-    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address;
 
     // Original args.
     const args = { ...input };

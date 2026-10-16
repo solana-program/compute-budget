@@ -17,6 +17,7 @@ import {
     type ClientWithTransactionPlanning,
     type ClientWithTransactionSending,
     type ExtendedClient,
+    type HasAddress,
     type Instruction,
     type InstructionWithData,
     type ReadonlyUint8Array,
@@ -146,39 +147,70 @@ export type ComputeBudgetPlugin = {
 export type ComputeBudgetPluginInstructions = {
     requestUnits: (
         input: RequestUnitsInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getRequestUnitsInstruction> & SelfPlanAndSendFunctions;
     requestHeapFrame: (
         input: RequestHeapFrameInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getRequestHeapFrameInstruction> & SelfPlanAndSendFunctions;
     setComputeUnitLimit: (
         input: SetComputeUnitLimitInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getSetComputeUnitLimitInstruction> & SelfPlanAndSendFunctions;
     setComputeUnitPrice: (
         input: SetComputeUnitPriceInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getSetComputeUnitPriceInstruction> & SelfPlanAndSendFunctions;
     setLoadedAccountsDataSizeLimit: (
         input: SetLoadedAccountsDataSizeLimitInput,
+        config?: { programAddress?: Address | HasAddress },
     ) => ReturnType<typeof getSetLoadedAccountsDataSizeLimitInstruction> & SelfPlanAndSendFunctions;
 };
 
 export type ComputeBudgetPluginRequirements = ClientWithTransactionPlanning & ClientWithTransactionSending;
 
-export function computeBudgetProgram() {
+export function computeBudgetProgram(config: { programAddress?: Address | HasAddress } = {}) {
     return <T extends ComputeBudgetPluginRequirements>(
         client: T,
     ): ExtendedClient<T, { computeBudget: ComputeBudgetPlugin }> => {
         return extendClient(client, {
             computeBudget: <ComputeBudgetPlugin>{
                 instructions: {
-                    requestUnits: input => addSelfPlanAndSendFunctions(client, getRequestUnitsInstruction(input)),
-                    requestHeapFrame: input =>
-                        addSelfPlanAndSendFunctions(client, getRequestHeapFrameInstruction(input)),
-                    setComputeUnitLimit: input =>
-                        addSelfPlanAndSendFunctions(client, getSetComputeUnitLimitInstruction(input)),
-                    setComputeUnitPrice: input =>
-                        addSelfPlanAndSendFunctions(client, getSetComputeUnitPriceInstruction(input)),
-                    setLoadedAccountsDataSizeLimit: input =>
-                        addSelfPlanAndSendFunctions(client, getSetLoadedAccountsDataSizeLimitInstruction(input)),
+                    requestUnits: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getRequestUnitsInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    requestHeapFrame: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getRequestHeapFrameInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    setComputeUnitLimit: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getSetComputeUnitLimitInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    setComputeUnitPrice: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getSetComputeUnitPriceInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
+                    setLoadedAccountsDataSizeLimit: (input, instructionConfig) =>
+                        addSelfPlanAndSendFunctions(
+                            client,
+                            getSetLoadedAccountsDataSizeLimitInstruction(input, {
+                                programAddress: instructionConfig?.programAddress ?? config.programAddress,
+                            }),
+                        ),
                 },
                 identifyInstruction: identifyComputeBudgetInstruction,
                 parseInstruction: parseComputeBudgetInstruction,

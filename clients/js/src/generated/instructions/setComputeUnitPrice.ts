@@ -81,10 +81,11 @@ export function getSetComputeUnitPriceInstruction<
     TProgramAddress extends Address = typeof COMPUTE_BUDGET_PROGRAM_ADDRESS,
 >(
     input: SetComputeUnitPriceInput,
-    config?: { programAddress?: TProgramAddress },
+    config?: { programAddress?: TProgramAddress | { readonly address: TProgramAddress } },
 ): SetComputeUnitPriceInstruction<TProgramAddress> {
     // Program address.
-    const programAddress = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? COMPUTE_BUDGET_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === 'string' ? programAddressInput : programAddressInput.address;
 
     // Original args.
     const args = { ...input };
